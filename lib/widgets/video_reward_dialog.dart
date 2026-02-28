@@ -5,6 +5,7 @@ import 'package:inkbattle_frontend/constants/app_colors.dart';
 import 'package:inkbattle_frontend/utils/preferences/local_preferences.dart';
 import 'package:inkbattle_frontend/widgets/text_widget.dart';
 import 'package:inkbattle_frontend/widgets/topCoins.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class VideoRewardDialog extends StatefulWidget {
   final int coinsAwarded;
@@ -157,7 +158,7 @@ class _VideoRewardDialogState extends State<VideoRewardDialog>
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text("Skip ",
+                          Text(AppLocalizations.skipButton,
                               style: TextStyle(
                                   color: Colors.white70, fontSize: 14.sp)),
                           Icon(Icons.arrow_forward_ios,

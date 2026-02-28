@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/widgets/text_widget.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class MultiSelectionBottomSheet extends StatefulWidget {
   final String title;
@@ -133,12 +134,12 @@ class _MultiSelectionBottomSheetState extends State<MultiSelectionBottomSheet> {
             controller: _searchController,
             style: GoogleFonts.lato(color: Colors.white, fontSize: 16.sp),
             decoration: InputDecoration(
-              labelText: 'Search',
+              labelText: AppLocalizations.search,
               labelStyle: GoogleFonts.lato(
                 color: Colors.white70,
                 fontSize: 14.sp,
               ),
-              hintText: 'Start typing to search...',
+              hintText: AppLocalizations.startTypingToSearch,
               hintStyle: GoogleFonts.lato(
                 color: const Color.fromRGBO(255, 255, 255, 0.52),
                 fontSize: 14.sp,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/constants/app_images.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class ExitPopUp extends StatelessWidget {
   final String? imagePath;
@@ -71,7 +72,7 @@ class ExitPopUp extends StatelessWidget {
 
               /// HEADER
               Text(
-                'LEAVE ROOM',
+                AppLocalizations.leaveRoom,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.luckiestGuy(
                   color: Colors.amber,
@@ -84,7 +85,7 @@ class ExitPopUp extends StatelessWidget {
 
               /// MESSAGE
               Text(
-                text ?? 'Do you really want to leave the room?',
+                text ?? AppLocalizations.doYouReallyWantToLeaveRoom,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
                   color: Colors.white,
@@ -116,7 +117,7 @@ class ExitPopUp extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'CANCEL',
+                        AppLocalizations.cancel.toUpperCase(),
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -143,7 +144,7 @@ class ExitPopUp extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'EXIT',
+                        AppLocalizations.exitButton,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

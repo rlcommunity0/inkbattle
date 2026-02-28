@@ -168,7 +168,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('${AppLocalizations.error}: $e')),
         );
       }
     } finally {

@@ -213,7 +213,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                             height: 60.h,
                             rouneded: 15.r,
                             fontSize: 20.sp,
-                            hintText: "XXXXX",
+                            hintText: AppLocalizations.roomCodePlaceholder,
                             hintTextColor:
                                 const Color.fromRGBO(255, 255, 255, 0.52),
                           ),

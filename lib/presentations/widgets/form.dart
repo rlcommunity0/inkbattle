@@ -5,6 +5,7 @@ import 'package:inkbattle_frontend/models/room_model.dart';
 import 'package:inkbattle_frontend/presentations/game/widgets/submitted.dart';
 import 'package:inkbattle_frontend/repositories/user_repository.dart';
 import 'package:inkbattle_frontend/services/native_log_service.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class FormPopup extends StatefulWidget {
   List<RoomParticipant> participants;
@@ -27,7 +28,11 @@ class _FormPopupState extends State<FormPopup> {
   final UserRepository _userRepository = UserRepository();
   final _descriptionController = TextEditingController();
 
-  final List<String> reasons = ['Spam', 'Abuse', 'Other'];
+  List<String> get reasons => [
+        AppLocalizations.reportReasonSpam,
+        AppLocalizations.reportReasonAbuse,
+        AppLocalizations.reportReasonOther,
+      ];
 
   @override
   void dispose() {
@@ -72,7 +77,7 @@ class _FormPopupState extends State<FormPopup> {
 
               /// TITLE
               Text(
-                'Report Member',
+                AppLocalizations.reportMember,
                 style: GoogleFonts.lato(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -91,7 +96,7 @@ class _FormPopupState extends State<FormPopup> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Member Name'),
+                        _buildLabel(AppLocalizations.memberName),
                         SizedBox(height: 4.h),
                         _buildDropdown<RoomParticipant>(
                           value: _selectedUser,
@@ -99,12 +104,12 @@ class _FormPopupState extends State<FormPopup> {
                           onChanged: (val) =>
                               setState(() => _selectedUser = val),
                           validator: (val) =>
-                              val == null ? 'Please select a member' : null,
+                              val == null ? AppLocalizations.pleaseSelectAMember : null,
                         ),
 
                         SizedBox(height: 15.h),
 
-                        _buildLabel('Reason'),
+                        _buildLabel(AppLocalizations.reason),
                         SizedBox(height: 4.h),
                         _buildDropdown<String>(
                           value: _selectedReason,
@@ -112,19 +117,19 @@ class _FormPopupState extends State<FormPopup> {
                           onChanged: (val) =>
                               setState(() => _selectedReason = val),
                           validator: (val) =>
-                              val == null ? 'Please select a reason' : null,
+                              val == null ? AppLocalizations.pleaseSelectAReason : null,
                         ),
 
                         SizedBox(height: 15.h),
 
-                        _buildLabel('Description'),
+                        _buildLabel(AppLocalizations.description),
                         SizedBox(height: 4.h),
                         TextFormField(
                           controller: _descriptionController,
                           style: const TextStyle(color: Colors.white),
                           maxLines: 3,
                           decoration: InputDecoration(
-                            hintText: "Enter description",
+                            hintText: AppLocalizations.enterDescription,
                             hintStyle:
                                 const TextStyle(color: Colors.white38),
                             filled: true,
@@ -136,7 +141,7 @@ class _FormPopupState extends State<FormPopup> {
                           ),
                           validator: (value) =>
                               value == null || value.isEmpty
-                                  ? 'Please enter description'
+                                  ? AppLocalizations.pleaseEnterDescription
                                   : null,
                         ),
                       ],
@@ -158,8 +163,8 @@ class _FormPopupState extends State<FormPopup> {
                           borderRadius: BorderRadius.circular(8.r)),
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancel',
+                    child: Text(
+                      AppLocalizations.cancel,
                       style: TextStyle(color: Colors.black),
                     ),
                   ),
@@ -186,9 +191,9 @@ class _FormPopupState extends State<FormPopup> {
                         );
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                                 content: Text(
-                                    'Could not get user id. Please try another member.')),
+                                    AppLocalizations.couldNotGetUserId)),
                           );
                         }
                         return;
@@ -229,8 +234,8 @@ class _FormPopupState extends State<FormPopup> {
                         },
                       );
                     },
-                    child: const Text(
-                      'Submit',
+                    child: Text(
+                      AppLocalizations.submit,
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

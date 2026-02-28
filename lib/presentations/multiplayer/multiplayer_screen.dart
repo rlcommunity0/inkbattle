@@ -857,7 +857,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedLanguage = val);
           _loadRooms();
         },
-        hintText: "Language",
+        hintText: AppLocalizations.language,
         iconColor: Colors.lightBlueAccent,
       );
 
@@ -869,7 +869,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedScript = val);
           _loadRooms();
         },
-        hintText: "Script",
+        hintText: AppLocalizations.script,
         iconColor: Colors.deepPurpleAccent,
       );
 
@@ -881,7 +881,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedPoints = val);
           _loadRooms();
         },
-        hintText: "Points",
+        hintText: AppLocalizations.points,
         iconColor: Colors.amber,
       );
 
@@ -893,7 +893,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedCountry = val);
           _loadRooms();
         },
-        hintText: "Country",
+        hintText: AppLocalizations.country,
         iconColor: Colors.lightGreenAccent,
       );
 
@@ -907,7 +907,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           });
           _loadRooms();
         },
-        hintText: "Category",
+        hintText: AppLocalizations.category,
         iconColor: Colors.orange,
       );
 

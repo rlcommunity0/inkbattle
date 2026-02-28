@@ -62,29 +62,7 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
   int? _movingAvatarIndex;
   final GlobalKey _centerAvatarKey = GlobalKey();
 
-final List<String> languages = [
-    "English",    // English
-    "हिंदी",      // Hindi
-    "తెలుగు",     // Telugu
-    "தமிழ்",      // Tamil
-    "मराठी",      // Marathi
-    "ಕನ್ನಡ",      // Kannada
-    "മലയാളം",    // Malayalam
-    "বাংলা",      // Bengali
-    "العربية",    // Arabic
-    "Español",    // Spanish
-    "Português",  // Portuguese
-    "Français",   // French
-    "Deutsch",    // German
-    "Русский",    // Russian
-    "日本語",      // Japanese
-    "ਪੰਜਾਬੀ",      // Punjabi
-    "ગુજરાતી",     // Gujarati
-    "Italiano",   // Italian
-    "한국어",      // Korean
-    "中文",        // Chinese
-  ];
-  // Countries are now handled via CountryPickerWidget with ISO-2 codes
+// Countries are now handled via CountryPickerWidget with ISO-2 codes
 
   void _selectAvatar(int index) {
     if (_movingAvatarIndex != null) return; // Prevent multiple animations
@@ -122,51 +100,7 @@ final List<String> languages = [
 
   void _loadLanguage() {
     final savedLanguage = LocalStorageUtils.getLanguage();
-    // Don't call setLanguage here - it's already set in main.dart
-    // Just map the language code to display name for the dropdown
-
-    // Map language codes to display names
-    if (savedLanguage == 'hi') {
-      selectedLanguage = 'हिंदी';
-    } else if (savedLanguage == 'te') {
-      selectedLanguage = 'తెలుగు';
-    } else if (savedLanguage == 'ta') {
-      selectedLanguage = 'தமிழ்';
-    } else if (savedLanguage == 'mr') {
-      selectedLanguage = 'मराठी';
-    } else if (savedLanguage == 'kn') {
-      selectedLanguage = 'ಕನ್ನಡ';
-    } else if (savedLanguage == 'ml') {
-      selectedLanguage = 'മലയാളം';
-    } else if (savedLanguage == 'bn') {
-      selectedLanguage = 'বাংলা';
-    } else if (savedLanguage == 'ar') {
-      selectedLanguage = 'العربية';
-    } else if (savedLanguage == 'es') {
-      selectedLanguage = 'Español';
-    } else if (savedLanguage == 'pt') {
-      selectedLanguage = 'Português';
-    } else if (savedLanguage == 'fr') {
-      selectedLanguage = 'Français';
-    } else if (savedLanguage == 'de') {
-      selectedLanguage = 'Deutsch';
-    } else if (savedLanguage == 'ru') { 
-      selectedLanguage = 'Русский';
-    } else if (savedLanguage == 'ja') {
-      selectedLanguage = '日本語';
-    } else if (savedLanguage == 'pa') {
-      selectedLanguage = 'ਪੰਜਾਬੀ';
-    } else if (savedLanguage == 'gu') {
-      selectedLanguage = 'ગુજરાતી';
-    } else if (savedLanguage == 'it') {
-      selectedLanguage = 'Italiano';
-    } else if (savedLanguage == 'ko') {
-      selectedLanguage = '한국어';
-    } else if (savedLanguage == 'zh') {
-      selectedLanguage = '中文';
-    } else {
-      selectedLanguage = 'English';
-    }
+    selectedLanguage = AppLocalizations.languageDisplayName(savedLanguage);
   }
 
   Future<void> _changeLanguage(String? language) async {
@@ -175,57 +109,12 @@ final List<String> languages = [
     setState(() {
       selectedLanguage = language;
     });
-    // Trigger rebuild to update button state
     if (mounted) setState(() {});
 
-    // Map display name to language code
-    String languageCode = 'en';
-    
-    if (language == 'हिंदी') {
-      languageCode = 'hi';
-    } else if (language == 'తెలుగు') {
-      languageCode = 'te';
-    } else if (language == 'தமிழ்') {
-      languageCode = 'ta';
-    } else if (language == 'मराठी') {
-      languageCode = 'mr';
-    } else if (language == 'ಕನ್ನಡ') {
-      languageCode = 'kn';
-    } else if (language == 'മലയാളം') {
-      languageCode = 'ml';
-    } else if (language == 'বাংলা') {
-      languageCode = 'bn';
-    } else if (language == 'العربية') {
-      languageCode = 'ar';
-    } else if (language == 'Español') {
-      languageCode = 'es';
-    } else if (language == 'Português') {
-      languageCode = 'pt';
-    } else if (language == 'Français') {
-      languageCode = 'fr';
-    } else if (language == 'Deutsch') {
-      languageCode = 'de';
-    } else if (language == 'Русский') {
-      languageCode = 'ru';
-    } else if (language == '日本語') {
-      languageCode = 'ja';
-    } else if (language == 'ਪੰਜਾਬੀ') {
-      languageCode = 'pa';
-    } else if (language == 'ગુજરાતી') {
-      languageCode = 'gu';
-    } else if (language == 'Italiano') {
-      languageCode = 'it';
-    } else if (language == '한국어') {
-      languageCode = 'ko';
-    } else if (language == '中文') {
-      languageCode = 'zh';
-    }
-
-    // Save and apply language
+    final languageCode = AppLocalizations.languageCodeFromDisplayName(language);
     await LocalStorageUtils.saveLanguage(languageCode);
     AppLocalizations.setLanguage(languageCode);
 
-    // Trigger rebuild
     if (mounted) setState(() {});
   }
 
@@ -506,7 +395,7 @@ final List<String> languages = [
                                 children: [
                                   Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                   SizedBox(width: 6.w),
-                                  Text('Please select an avatar', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                  Text(AppLocalizations.pleaseSelectAnAvatar, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                 ],
                               ),
                             ),
@@ -545,7 +434,7 @@ final List<String> languages = [
                                     children: [
                                       Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                       SizedBox(width: 6.w),
-                                      Text('Please enter username', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                      Text(AppLocalizations.pleaseEnterUsername, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                     ],
                                   ),
                                 ],
@@ -562,7 +451,7 @@ final List<String> languages = [
                                 _buildGradientDropdown(
                                   hint: AppLocalizations.language,
                                   value: selectedLanguage,
-                                  items: languages,
+                                  items: AppLocalizations.supportedLanguageDisplayNames,
                                   isTablet: isTablet,
                                   prefixIcon: Padding(
                                     padding: EdgeInsets.all(12.w),
@@ -581,7 +470,7 @@ final List<String> languages = [
                                     children: [
                                       Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                       SizedBox(width: 6.w),
-                                      Text('Please select any language', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                      Text(AppLocalizations.pleaseSelectAnyLanguage, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                     ],
                                   ),
                                 ],
@@ -604,7 +493,7 @@ final List<String> languages = [
                                     children: [
                                       Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                       SizedBox(width: 6.w),
-                                      Text('Please select any country', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                      Text(AppLocalizations.pleaseSelectAnyCountry, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                     ],
                                   ),
                                 ],
@@ -636,7 +525,7 @@ final List<String> languages = [
                                     children: [
                                       Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                       SizedBox(width: 6.w),
-                                      Text('Please select any country', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                      Text(AppLocalizations.pleaseSelectAnyCountry, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                     ],
                                   ),
                                 ],
@@ -970,7 +859,7 @@ final List<String> languages = [
       backgroundColor: Colors.transparent,
       builder: (context) => SelectionBottomSheet(
         title: AppLocalizations.language,
-        items: languages,
+        items: AppLocalizations.supportedLanguageDisplayNames,
         selectedItem: selectedLanguage,
       ),
     );
@@ -1106,31 +995,11 @@ final List<String> languages = [
     setState(() => _isSubmitting = true);
 
     try {
-      String languageCode = 'en';
+      final languageCode = selectedLanguage != null
+          ? AppLocalizations.languageCodeFromDisplayName(selectedLanguage!)
+          : 'en';
 
       if (selectedLanguage != null) {
-        // Map Native -> Code
-        if (selectedLanguage == 'हिंदी') languageCode = 'hi';
-        else if (selectedLanguage == 'తెలుగు') languageCode = 'te';
-        else if (selectedLanguage == 'தமிழ்') languageCode = 'ta';
-        else if (selectedLanguage == 'मराठी') languageCode = 'mr';
-        else if (selectedLanguage == 'ಕನ್ನಡ') languageCode = 'kn';
-        else if (selectedLanguage == 'മലയാളം') languageCode = 'ml';
-        else if (selectedLanguage == 'বাংলা') languageCode = 'bn';
-        else if (selectedLanguage == 'العربية') languageCode = 'ar';
-        else if (selectedLanguage == 'Español') languageCode = 'es';
-        else if (selectedLanguage == 'Português') languageCode = 'pt';
-        else if (selectedLanguage == 'Français') languageCode = 'fr';
-        else if (selectedLanguage == 'Deutsch') languageCode = 'de';
-        else if (selectedLanguage == 'Русский') languageCode = 'ru';
-        else if (selectedLanguage == '日本語') languageCode = 'ja';
-        else if (selectedLanguage == 'ਪੰਜਾਬੀ') languageCode = 'pa';
-        else if (selectedLanguage == 'ગુજરાતી') languageCode = 'gu';
-        else if (selectedLanguage == 'Italiano') languageCode = 'it';
-        else if (selectedLanguage == '한국어') languageCode = 'ko';
-        else if (selectedLanguage == '中文') languageCode = 'zh';
-
-        // Save locally for immediate UI update
         await LocalStorageUtils.saveLanguage(languageCode);
         AppLocalizations.setLanguage(languageCode);
       }
@@ -1395,9 +1264,9 @@ class _CountrySelectionBottomSheetState extends State<_CountrySelectionBottomShe
             controller: _searchController,
             style: GoogleFonts.lato(color: Colors.white, fontSize: 16.sp),
             decoration: InputDecoration(
-              labelText: 'Search',
+              labelText: AppLocalizations.search,
               labelStyle: GoogleFonts.lato(color: Colors.white70, fontSize: 14.sp),
-              hintText: 'Search country...',
+              hintText: AppLocalizations.searchCountry,
               hintStyle: GoogleFonts.lato(color: const Color.fromRGBO(255, 255, 255, 0.52), fontSize: 14.sp),
               prefixIcon: const Icon(Icons.search, color: Color.fromRGBO(9, 189, 255, 1)),
               contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -1411,7 +1280,7 @@ class _CountrySelectionBottomSheetState extends State<_CountrySelectionBottomShe
           SizedBox(height: 15.h),
           Expanded(
             child: _filteredCountries.isEmpty
-                ? Center(child: TextWidget(text: 'No matches found', color: Colors.grey, fontSize: 14.sp))
+                ? Center(child: TextWidget(text: AppLocalizations.noMatchesFound, color: Colors.grey, fontSize: 14.sp))
                 : ListView.separated(
                     physics: const BouncingScrollPhysics(),
                     itemCount: _filteredCountries.length,
@@ -1560,7 +1429,7 @@ class _TabletAvatarSelectionSheetState extends State<_TabletAvatarSelectionSheet
                       ),
                       child: Center(
                         child: Text(
-                          'Choose photos',
+                          AppLocalizations.choosePhotos,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -1623,11 +1492,11 @@ class _TabletAvatarSelectionSheetState extends State<_TabletAvatarSelectionSheet
                       children: [
                         Icon(Icons.photo_library_outlined, size: 48.sp, color: Colors.grey),
                         SizedBox(height: 12.h),
-                        Text('Choose from gallery', style: TextStyle(fontSize: 16.sp, color: Colors.black87)),
+                        Text(AppLocalizations.chooseFromGallery, style: TextStyle(fontSize: 16.sp, color: Colors.black87)),
                         SizedBox(height: 16.h),
                         TextButton(
                           onPressed: widget.onChoosePhoto,
-                          child: Text('Open gallery', style: TextStyle(fontSize: 16.sp)),
+                          child: Text(AppLocalizations.openGallery, style: TextStyle(fontSize: 16.sp)),
                         ),
                       ],
                     ),

@@ -8,6 +8,7 @@ import 'package:dotlottie_flutter/dotlottie_flutter.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:inkbattle_frontend/config/environment.dart';
 import 'package:inkbattle_frontend/utils/preferences/local_preferences.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class DailyCoinsPopup extends StatefulWidget {
   final Function(dynamic)? onClaimed;
@@ -361,8 +362,8 @@ Widget build(BuildContext context) {
                 ),
                 child: Text(
                   _claimed
-                      ? "AWESOME!"
-                      : (_canClaim ? "CLAIM NOW!" : "OK"),
+                      ? AppLocalizations.awesome
+                      : (_canClaim ? AppLocalizations.claimNow : AppLocalizations.ok),
                   style: GoogleFonts.luckiestGuy(
                     fontSize: isTablet ? 24 : 20,
                     color: Colors.white,

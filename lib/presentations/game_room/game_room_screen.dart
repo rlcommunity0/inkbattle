@@ -329,31 +329,31 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   bool _showOptionMenu = false;
   static const String _drawerMessagePrefix = 'drawer_message:';
 
-  final List<_DrawerMessageOption> _drawerMessageOptions =
-      const <_DrawerMessageOption>[
+  List<_DrawerMessageOption> get _drawerMessageOptions =>
+      <_DrawerMessageOption>[
     _DrawerMessageOption(
       key: 'correct',
-      label: 'Correct',
+      label: AppLocalizations.correct,
       iconPath: AppImages.messageCorrect,
-      accentColor: Color(0xFF3EE07F),
+      accentColor: const Color(0xFF3EE07F),
     ),
     _DrawerMessageOption(
       key: 'wrong',
-      label: 'Wrong',
+      label: AppLocalizations.wrong,
       iconPath: AppImages.messageWrong,
-      accentColor: Color(0xFFE53935),
+      accentColor: const Color(0xFFE53935),
     ),
     _DrawerMessageOption(
       key: 'break_word',
-      label: 'Break Word',
+      label: AppLocalizations.breakWord,
       iconPath: AppImages.messageBreakWord,
-      accentColor: Color(0xFF57C6FF),
+      accentColor: const Color(0xFF57C6FF),
     ),
     _DrawerMessageOption(
       key: 'alternate',
-      label: 'Alternate',
+      label: AppLocalizations.alternate,
       iconPath: AppImages.messageAlternate,
-      accentColor: Color(0xFFFFC857),
+      accentColor: const Color(0xFFFFC857),
     ),
   ];
   final universalBorder =
@@ -1385,7 +1385,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Server is syncing. Please try again in a moment.'),
+              content: Text(AppLocalizations.serverSyncingTryAgain),
               duration: Duration(seconds: 3),
             ),
           );
@@ -1587,7 +1587,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 if (mounted && _room?.status != 'playing') {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Both teams need at least 2 players. Exiting room...'),
+                      content: Text(AppLocalizations.bothTeamsNeedPlayersExiting),
                       backgroundColor: Colors.orange,
                       duration: Duration(seconds: 2),
                     ),
@@ -1679,7 +1679,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         if (isMe) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('You were removed by the host.'),
+              content: Text(AppLocalizations.youWereRemovedByHost),
               backgroundColor: Colors.orange,
               duration: Duration(seconds: 2),
             ),
@@ -1696,7 +1696,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           _scrollToBottom();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$name was removed by the host.'),
+              content: Text('$name${AppLocalizations.nameWasRemovedByHost}'),
               backgroundColor: Colors.orange,
               duration: const Duration(seconds: 2),
             ),
@@ -1920,7 +1920,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("System: " + message),
+            content: Text(AppLocalizations.system + message),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 2),
           ),
@@ -2533,7 +2533,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
-                Text('$skippedName missed their turn. Selecting next artist...'),
+                Text('$skippedName${AppLocalizations.nameMissedTurnSelectingNext}'),
             backgroundColor: Colors.orange,
             duration: const Duration(seconds: 2),
           ),
@@ -2584,7 +2584,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       // Don't show snackbar if app is resuming (prevents obstruction)
       if (!_isResuming && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message ?? "Eliminated for inactivity"), backgroundColor: Colors.orange),
+          SnackBar(content: Text(message ?? AppLocalizations.eliminatedForInactivity), backgroundColor: Colors.orange),
         );
       }
       if (eliminatedParticipant["userId"] == _currentDrawerInfo?["id"]) {
@@ -3043,7 +3043,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     _socketService.onGameEndedInsufficientPlayers((data) {
       if (mounted) {
         _stopGameTimers();
-        final message = data['message'] ?? 'Not enough players. Exiting room.';
+        final message = data['message'] ?? AppLocalizations.notEnoughPlayersExitingRoom;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message),
@@ -3061,7 +3061,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       if (mounted) {
         _stopGameTimers();
         final message = data['message'] ??
-            'Exited as you were not active for more than 90 seconds.';
+            AppLocalizations.exitedInactive90Seconds;
         _showCloseAdAndNavigate(
           snackbarThenGoHome: message,
         );
@@ -3093,7 +3093,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Room closed: ${data['message'] ?? 'No active participants'}'),
+                  '${AppLocalizations.roomClosed}${data['message'] ?? AppLocalizations.noActiveParticipants}'),
               backgroundColor: Colors.orange,
             ),
           );
@@ -3109,7 +3109,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     _socketService.socket?.on('error', (data) {
       
       if (mounted) {
-        final message = data['message'] ?? 'Unknown error';
+        final message = data['message'] ?? AppLocalizations.unknownError;
         final details = data['details'] ?? '';
 
         // Suppress "room_not_found" errors during resume - they're often false positives
@@ -3126,60 +3126,60 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         String errorMessage = '';
         switch (message) {
           case 'only_owner_can_start':
-            errorMessage = 'Only the host can start the game';
+            errorMessage = AppLocalizations.onlyHostCanStartGame;
             break;
           case 'not_enough_players':
-            errorMessage = 'Need at least 2 players to start';
+            errorMessage = AppLocalizations.needAtLeast2PlayersToStart;
             break;
           case 'insufficient_coins':
             errorMessage =
-                details.isNotEmpty ? details : 'Insufficient coins to start';
+                details.isNotEmpty ? details : AppLocalizations.insufficientCoinsToStart;
             break;
           case 'both_teams_need_players':
             errorMessage = details.isNotEmpty
                 ? details
-                : 'Both teams need at least 2 players to start.';
+                : '${AppLocalizations.bothTeamsNeedPlayers} to start.';
             break;
           case 'not_all_ready':
             errorMessage = details.isNotEmpty
                 ? details
-                : 'All players must tap Ready before the host can start.';
+                : AppLocalizations.allPlayersMustTapReadyBeforeHost;
             break;
           case 'only_owner_can_remove':
-            errorMessage = 'Only the host can remove players.';
+            errorMessage = AppLocalizations.onlyHostCanRemovePlayers;
             break;
           case 'cannot_remove_during_game':
-            errorMessage = 'Cannot remove players during the game.';
+            errorMessage = AppLocalizations.cannotRemovePlayersDuringGame;
             break;
           case 'not_team_mode':
             errorMessage = details.isNotEmpty
                 ? details
-                : 'Team selection is only available in team vs team mode. Please change the game mode first.';
+                : AppLocalizations.teamSelectionOnlyInTeamMode;
             break;
           case 'game_already_started':
-            errorMessage = 'Game has already started';
+            errorMessage = AppLocalizations.gameAlreadyStarted;
             break;
           case 'not_authenticated':
-            errorMessage = 'Authentication error. Please reconnect.';
+            errorMessage = AppLocalizations.authenticationErrorReconnect;
             break;
           case 'you_were_replaced':
             errorMessage = details.toString().isNotEmpty
                 ? details.toString()
-                : 'Due to inactivity, someone replaced you in this room.';
+                : AppLocalizations.replacedDueToInactivity;
             break;
           case 'room_full':
             errorMessage = details.toString().isNotEmpty
                 ? details.toString()
-                : 'Room is full. Max players reached.';
+                : AppLocalizations.roomFullMaxPlayers;
             break;
           case 'you_are_banned':
-            errorMessage = 'You are banned from this room.';
+            errorMessage = AppLocalizations.youAreBannedFromRoom;
             break;
           case 'room_not_found':
-            errorMessage = 'Room no longer exists. Leaving.';
+            errorMessage = AppLocalizations.roomNoLongerExistsLeaving;
             break;
           default:
-            errorMessage = 'Error: $message';
+            errorMessage = '${AppLocalizations.error}: $message';
         }
         if (mounted) {
           snackbarKey.currentState!.showSnackBar(
@@ -3397,7 +3397,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Pick a color'),
+        title: Text(AppLocalizations.pickAColor),
         content: SingleChildScrollView(
           child: BlockPicker(
             pickerColor: _selectedColor,
@@ -3441,7 +3441,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A2942),
         title:
-            const Text('Pick a color', style: TextStyle(color: Colors.white)),
+            Text(AppLocalizations.pickAColor, style: TextStyle(color: Colors.white)),
         content: SingleChildScrollView(
           child: BlockPicker(
             pickerColor: _selectedColor,
@@ -3878,7 +3878,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   Navigator.of(ctx).pop();
                   onComplete();
                 },
-                child: Text('Continue', style: TextStyle(color: Colors.white, fontSize: 18.sp)),
+                child: Text(AppLocalizations.continueButton, style: TextStyle(color: Colors.white, fontSize: 18.sp)),
               ),
             ],
           ),
@@ -5343,14 +5343,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             TeamScoreBar(
                 maxScore: _room?.pointsTarget ?? 250,
                 barColor: Colors.blue,
-                label: 'A',
+                label: AppLocalizations.teamA,
                 labelBgColor: Colors.blue,
                 score: blueScore),
           SizedBox(height: 12.h),
           if (selectedGameMode == "team_vs_team")
             TeamScoreBar(
                 barColor: Colors.orange,
-                label: 'B',
+                label: AppLocalizations.teamB,
                 maxScore: _room?.pointsTarget ?? 250,
                 labelBgColor: Colors.orange,
                 score: orangeScore),
@@ -5422,13 +5422,13 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   fontWeight: FontWeight.bold,
                 )),
           if (userAnsweredCorrectly)
-            Text("You are right!",
+            Text(AppLocalizations.youAreRight,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                 )),
-          Text("Correct Answer was",
+          Text(AppLocalizations.correctAnswerWas,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18.sp,
@@ -5954,7 +5954,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                             _updateSettings();
                                           }
                                         : (_) {},
-                                    hintText: 'Country',
+                                    hintText: AppLocalizations.country,
                                     icon: Icons.flag,
                                     height: isTablet ? 65.0 : 45.h,
                                     iconColor: Colors.lightGreenAccent,
@@ -6554,21 +6554,21 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                   if (!_areAllParticipantsReady() && _participants.length >= 2) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('All players must tap Ready before start'),
+                                        content: Text(AppLocalizations.allPlayersMustTapReady),
                                         backgroundColor: Colors.orange,
                                       ),
                                     );
                                   } else if (selectedGameMode == 'team_vs_team' && !_hasEnoughPlayersForTeamMode()) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Both teams need at least 2 players'),
+                                        content: Text(AppLocalizations.bothTeamsNeedPlayers),
                                         backgroundColor: Colors.orange,
                                       ),
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Please fill all details'),
+                                        content: Text(AppLocalizations.pleaseFillAllDetails),
                                       ),
                                     );
                                   }
@@ -8462,7 +8462,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to select team. Please try again.'),
+            content: Text(AppLocalizations.failedToSelectTeam),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -8475,7 +8475,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     if (_room?.code != null) {
       Clipboard.setData(ClipboardData(text: _room!.code!));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Room code copied!')),
+        SnackBar(content: Text(AppLocalizations.roomCodeCopied)),
       );
     }
   }
@@ -8700,7 +8700,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                         _updateSettings();
                       }
                     : (_) {},
-                hintText: 'Country',
+                hintText: AppLocalizations.country,
                 icon: Icons.flag,
                 isTablet: isTablet,
               ),
@@ -8747,7 +8747,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             Expanded(
                 child: _buildToggle(
               icon: Icons.mic,
-              label: 'Voice',
+              label: AppLocalizations.voice,
               value: voiceEnabled,
               enabled: isOwner,
               isTablet: isTablet,
@@ -8760,7 +8760,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             Expanded(
                 child: _buildToggle(
               icon: Icons.public,
-              label: 'Public',
+              label: AppLocalizations.public,
               value: isPublic,
               enabled: isOwner,
               isTablet: isTablet,
@@ -10201,7 +10201,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 teamBadge(
-                  label: 'A',
+                  label: AppLocalizations.teamA,
                   color: const Color(0xFF02A9F7),
                   onTap: () => _showTeamPlayers('blue', 'Team A'),
                   isTablet: isTablet,
@@ -10229,7 +10229,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 ),
                 SizedBox(width: 14.w),
                 teamBadge(
-                  label: 'B',
+                  label: AppLocalizations.teamB,
                   color: const Color(0xFFF59E0B),
                   onTap: () => _showTeamPlayers('orange', 'Team B'),
                   isTablet: isTablet,
@@ -10464,7 +10464,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     final List<Widget> optionTiles = [
       _buildOptionTile(
         imageAsset: AppImages.correct,
-        label: 'Correct',
+        label: AppLocalizations.correct,
         onTap: () {
           setState(() {
             _showOptionMenu = false;
@@ -10474,7 +10474,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       ),
       _buildOptionTile(
         imageAsset: AppImages.wrong,
-        label: 'Wrong',
+        label: AppLocalizations.wrong,
         onTap: () {
           setState(() {
             _showOptionMenu = false;
@@ -10484,7 +10484,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       ),
       _buildOptionTile(
         imageAsset: AppImages.breakWord,
-        label: 'Break Word',
+        label: AppLocalizations.breakWord,
         onTap: () {
           setState(() {
             _showOptionMenu = false;
@@ -10494,7 +10494,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       ),
       _buildOptionTile(
         imageAsset: AppImages.alternateWord,
-        label: 'Alternate Word',
+        label: AppLocalizations.alternate,
         onTap: () {
           setState(() {
             _showOptionMenu = false;
@@ -11186,7 +11186,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           });
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Room code copied!')),
+          SnackBar(content: Text(AppLocalizations.roomCodeCopied)),
         );
       },
       child: Container(
@@ -12792,22 +12792,22 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
       if (guessed > (total * 0.75)) {
         // Check 66.6% threshold first
-        return const Text("🎉 Well Done!!!",
+        return Text(AppLocalizations.wellDoneParty,
             style: TextStyle(color: Colors.white, fontSize: 20));
       } else if (guessed > (total * 0.5)) {
         color = const Color.fromRGBO(142, 152, 255, 1);
         // Check 50% threshold next
-        return const Text("👏 Good Job!",
+        return Text(AppLocalizations.goodJobClap,
             style: TextStyle(color: Colors.white, fontSize: 20));
       } else if (guessed == 0) {
         color = Colors.red;
         textColor = Colors.red;
         // Check 33.3% threshold next
-        return const Text("😢 Oops! Time’s Up!",
+        return Text(AppLocalizations.oopsTimeUp,
             style: TextStyle(color: Colors.white, fontSize: 20));
       } else {
         // Final default case
-        return const Text("👌 Nice Try!",
+        return Text(AppLocalizations.niceTry,
             style: TextStyle(color: Colors.white, fontSize: 20));
       }
     }
@@ -13187,7 +13187,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               if (!_isDrawer) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Only the drawer can send these messages.'),
+                    content: Text(AppLocalizations.onlyDrawerCanSend),
                     duration: Duration(seconds: 2),
                   ),
                 );
@@ -13204,7 +13204,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         child: Row(
           children: [
             Text(
-              'Message :',
+              AppLocalizations.messageLabel,
               style: GoogleFonts.lato(
                 color: Colors.white60,
                 fontSize: 13.sp,
@@ -13320,7 +13320,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                       borderRadius: BorderRadius.circular(20.r),
                                       border: universalBorder),
                                   child: Text(
-                                    'Answers chat',
+                                    AppLocalizations.answersChat,
                                     style: GoogleFonts.inter(
                                       color: Colors.white70,
                                       fontSize: 12.sp,
@@ -13369,7 +13369,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                             ),
                                             SizedBox(height: 12.h),
                                             Text(
-                                              'Type your answers here. If you\'re correct, it will be marked in green',
+                                              AppLocalizations.answersChatInstruction,
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.white70,
@@ -13509,7 +13509,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                         fontSize: 14.sp,
                                       ),
                                       decoration: InputDecoration(
-                                        hintText: 'Type your answers here...',
+                                        hintText: AppLocalizations.typeAnswersHere,
                                         hintStyle: TextStyle(
                                           color: Colors.white38,
                                           fontSize: 10.sp,
@@ -13625,7 +13625,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text("(Spectating)", style: GoogleFonts.lato(color: Colors.white24, fontSize: 8.sp)),
+                                  Text(AppLocalizations.spectating, style: GoogleFonts.lato(color: Colors.white24, fontSize: 8.sp)),
                                 ],
                               )
                             : Column(
@@ -13644,7 +13644,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                       horizontal: 6.w, vertical: 3.h),
                                   child: Center(
                                     child: Text(
-                                      'Answers chat',
+                                      AppLocalizations.answersChat,
                                       style: GoogleFonts.inter(
                                         color: Colors.white70,
                                         fontSize: 12.sp,
@@ -13678,7 +13678,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                 ),
                                                 SizedBox(height: 8.h),
                                                 Text(
-                                                  'Type your answers here. If you\'re correct, it will be marked in green',
+                                                  AppLocalizations.answersChatInstruction,
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     color: Colors.white70,
@@ -13982,7 +13982,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                       fontSize: 14.sp,
                                     ),
                                     decoration: InputDecoration(
-                                      hintText: 'Type anything...',
+                                      hintText: AppLocalizations.typeAnything,
                                       hintStyle: TextStyle(
                                         color: Colors.white38,
                                         fontSize: 14.sp,
@@ -14229,7 +14229,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           ),
         ),
         Text(
-          "(Spectating)",
+          AppLocalizations.spectating,
           style: GoogleFonts.lato(
             color: Colors.white24,
             fontSize: 8.sp,
@@ -14263,7 +14263,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                           border: universalBorder,
                         ),
                         child: Text(
-                          'Answers chat',
+                          AppLocalizations.answersChat,
                           style: GoogleFonts.inter(
                             color: Colors.white70,
                             fontSize: 14.sp,
@@ -14421,7 +14421,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                             ),
                             cursorColor: Colors.white.withOpacity(0.8),
                             decoration: InputDecoration(
-                              hintText: 'Type anything...',
+                              hintText: AppLocalizations.typeAnything,
                               hintStyle: TextStyle(
                                 color: Colors.white38,
                                 fontSize: 12.sp,
@@ -14485,7 +14485,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     padding: EdgeInsets.only(top: 5.h, bottom: 5.h),
                     child: Stack(
                       children: [
-                        Text("Correct answer 🥳",
+                        Text(AppLocalizations.correctAnswerParty,
                             style: GoogleFonts.roboto(
                               fontWeight: FontWeight.bold,
                               foreground: Paint()
@@ -14494,7 +14494,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                 ..strokeWidth = 2.0 // Thickness of the outline
                                 ..color = Colors.black,
                             )),
-                        Text("Correct answer 🥳",
+                        Text(AppLocalizations.correctAnswerParty,
                             style: GoogleFonts.roboto(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -14648,7 +14648,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                       ),
                       cursorColor: Colors.white.withOpacity(0.8),
                       decoration: InputDecoration(
-                        hintText: 'Type anything...',
+                        hintText: AppLocalizations.typeAnything,
                         hintStyle: TextStyle(
                           color: Colors.white38,
                           fontSize: 12.sp,

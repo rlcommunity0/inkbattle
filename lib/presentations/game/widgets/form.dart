@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/models/room_model.dart';
 import 'package:inkbattle_frontend/presentations/game/widgets/submitted.dart';
 import 'package:inkbattle_frontend/repositories/user_repository.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class FormPopup extends StatefulWidget {
   List<RoomParticipant> participants;
@@ -22,7 +23,11 @@ class _FormPopupState extends State<FormPopup> {
   final _descriptionController = TextEditingController();
 
   final List<String> members = [];
-  final List<String> reasons = ['Spam', 'Abuse', 'Other'];
+  List<String> get reasons => [
+        AppLocalizations.reportReasonSpam,
+        AppLocalizations.reportReasonAbuse,
+        AppLocalizations.reportReasonOther,
+      ];
 
   @override
   void dispose() {
@@ -54,7 +59,7 @@ class _FormPopupState extends State<FormPopup> {
         side: const BorderSide(color: Colors.yellow, width: 1.5),
       ),
       title: Text(
-        'Report Member',
+        AppLocalizations.reportMember,
         style: GoogleFonts.lato(
           color: Colors.white,
           fontWeight: FontWeight.w600,
@@ -68,27 +73,27 @@ class _FormPopupState extends State<FormPopup> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildLabel('Member Name'),
+              _buildLabel(AppLocalizations.memberName),
               SizedBox(height: 4.h),
               _buildDropdown<RoomParticipant>(
                 value: _selectedUser,
                 items: widget.participants,
                 onChanged: (val) => setState(() => _selectedUser = val),
                 validator: (val) =>
-                    val == null ? 'Please select a member' : null,
+                    val == null ? AppLocalizations.pleaseSelectAMember : null,
               ),
               SizedBox(height: 15.h),
-              _buildLabel('Reason'),
+              _buildLabel(AppLocalizations.reason),
               SizedBox(height: 4.h),
               _buildDropdown(
                 value: _selectedReason,
                 items: reasons,
                 onChanged: (val) => setState(() => _selectedReason = val),
                 validator: (val) =>
-                    val == null ? 'Please select a reason' : null,
+                    val == null ? AppLocalizations.pleaseSelectAReason : null,
               ),
               SizedBox(height: 15.h),
-              _buildLabel('Description'),
+              _buildLabel(AppLocalizations.description),
               SizedBox(height: 4.h),
               TextFormField(
                 controller: _descriptionController,
@@ -103,7 +108,7 @@ class _FormPopupState extends State<FormPopup> {
                   ),
                 ),
                 validator: (value) => value == null || value.isEmpty
-                    ? 'Please enter description'
+                    ? AppLocalizations.pleaseEnterDescription
                     : null,
               ),
             ],
@@ -120,8 +125,8 @@ class _FormPopupState extends State<FormPopup> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text(
-            'Cancel',
+          child: Text(
+            AppLocalizations.cancel,
             style: TextStyle(color: Colors.black),
           ),
         ),
@@ -162,8 +167,8 @@ class _FormPopupState extends State<FormPopup> {
               },
             );
           },
-          child: const Text(
-            'Submit',
+          child: Text(
+            AppLocalizations.submit,
             style: TextStyle(color: Colors.white),
           ),
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/widgets/text_widget.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class SelectionBottomSheet extends StatefulWidget {
   final String title;
@@ -103,12 +104,12 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
             controller: _searchController,
             style: GoogleFonts.lato(color: Colors.white, fontSize: 16.sp),
             decoration: InputDecoration(
-              labelText: 'Search',
+              labelText: AppLocalizations.search,
               labelStyle: GoogleFonts.lato(
                 color: Colors.white70,
                 fontSize: 14.sp,
               ),
-              hintText: 'Start typing to search...',
+              hintText: AppLocalizations.startTypingToSearch,
               hintStyle: GoogleFonts.lato(
                 color: const Color.fromRGBO(255, 255, 255, 0.52),
                 fontSize: 14.sp,
@@ -150,7 +151,7 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
             child: _filteredItems.isEmpty
                 ? Center(
                     child: TextWidget(
-                      text: 'No matches found',
+                      text: AppLocalizations.noMatchesFound,
                       color: Colors.grey,
                       fontSize: 14.sp,
                     ),

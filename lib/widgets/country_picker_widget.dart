@@ -5,6 +5,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:inkbattle_frontend/presentations/room_preferences/widgets/selection_bottom_sheet.dart'; 
 import 'package:inkbattle_frontend/widgets/custom_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 /// A reusable country picker widget that returns ISO-2 country codes
 /// 
@@ -13,7 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 class CountryPickerWidget extends StatelessWidget {
   final String? selectedCountryCode; // ISO-2 code (e.g., "US", "IN", "GB")
   final ValueChanged<String?> onCountrySelected; // Callback with ISO-2 code
-  final String hintText;
+  final String? hintText;
   final String? imageUrl;
   final IconData? icon;
   final Color? iconColor;
@@ -26,7 +27,7 @@ class CountryPickerWidget extends StatelessWidget {
     super.key,
     this.selectedCountryCode,
     required this.onCountrySelected,
-    this.hintText = 'Country',
+    this.hintText,
     this.imageUrl,
     this.icon,
     this.iconColor,
@@ -75,7 +76,7 @@ class CountryPickerWidget extends StatelessWidget {
     final countryName = countryCode != null 
         ? getCountryName(countryCode) 
         : null;
-    final displayText = countryName ?? hintText;
+    final displayText = countryName ?? hintText ?? AppLocalizations.country;
     final isFilled = countryCode != null && countryCode.isNotEmpty;
 
     if (useGradientDesign) {
@@ -368,7 +369,7 @@ class CountryPickerWidget extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => SelectionBottomSheet(
-        title: 'Select Country',
+        title: AppLocalizations.selectCountry,
         items: countryItems,
         selectedItem: currentSelection,
       ),

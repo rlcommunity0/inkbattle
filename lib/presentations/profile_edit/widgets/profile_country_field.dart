@@ -7,6 +7,7 @@ import 'package:inkbattle_frontend/constants/app_images.dart';
 import 'package:inkbattle_frontend/widgets/text_widget.dart';
 
 import 'package:inkbattle_frontend/widgets/country_picker_widget.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 /// Profile-edit–specific country field with aligned UI and custom dropdown icon.
 /// Uses [AppImages.dropdownIcon] for the dropdown indicator and matches
@@ -327,10 +328,10 @@ class _ProfileCountrySelectionBottomSheetState
             controller: _searchController,
             style: GoogleFonts.lato(color: Colors.white, fontSize: 16.sp),
             decoration: InputDecoration(
-              labelText: 'Search',
+              labelText: AppLocalizations.search,
               labelStyle:
                   GoogleFonts.lato(color: Colors.white70, fontSize: 14.sp),
-              hintText: 'Search country...',
+              hintText: AppLocalizations.searchCountry,
               hintStyle: GoogleFonts.lato(
                   color: const Color.fromRGBO(255, 255, 255, 0.52),
                   fontSize: 14.sp),
@@ -359,7 +360,7 @@ class _ProfileCountrySelectionBottomSheetState
             child: _filteredCountries.isEmpty
                 ? Center(
                     child: TextWidget(
-                        text: 'No matches found',
+                        text: AppLocalizations.noMatchesFound,
                         color: Colors.grey,
                         fontSize: 14.sp))
                 : ListView.separated(

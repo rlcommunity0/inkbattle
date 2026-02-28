@@ -68,29 +68,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
   double _swipeOffset = 0.0;
   bool _isSwiping = false;
 
-final List<String> languages = [
-    "English",    // English
-    "हिंदी",      // Hindi
-    "తెలుగు",     // Telugu
-    "தமிழ்",      // Tamil
-    "मराठी",      // Marathi
-    "ಕನ್ನಡ",      // Kannada
-    "മലയാളം",    // Malayalam
-    "বাংলা",      // Bengali
-    "العربية",    // Arabic
-    "Español",    // Spanish
-    "Português",  // Portuguese
-    "Français",   // French
-    "Deutsch",    // German
-    "Русский",    // Russian
-    "日本語",      // Japanese
-    "ਪੰਜਾਬੀ",      // Punjabi
-    "ગુજરાતી",     // Gujarati
-    "Italiano",   // Italian
-    "한국어",      // Korean
-    "中文",        // Chinese
-  ];
-  // Countries are now handled via CountryPickerWidget with ISO-2 codes
+// Countries are now handled via CountryPickerWidget with ISO-2 codes
 
   void _onAvatarSwipeLeft() {
     if (_isSwiping) return;
@@ -134,48 +112,7 @@ final List<String> languages = [
 
   void _loadLanguage() {
     final savedLanguage = LocalStorageUtils.getLanguage();
-    
-    if (savedLanguage == 'hi') {
-      selectedLanguage = 'हिंदी';
-    } else if (savedLanguage == 'te') {
-      selectedLanguage = 'తెలుగు';
-    } else if (savedLanguage == 'ta') {
-      selectedLanguage = 'தமிழ்';
-    } else if (savedLanguage == 'mr') {
-      selectedLanguage = 'मराठी';
-    } else if (savedLanguage == 'kn') {
-      selectedLanguage = 'ಕನ್ನಡ';
-    } else if (savedLanguage == 'ml') {
-      selectedLanguage = 'മലയാളം';
-    } else if (savedLanguage == 'bn') {
-      selectedLanguage = 'বাংলা';
-    } else if (savedLanguage == 'ar') {
-      selectedLanguage = 'العربية';
-    } else if (savedLanguage == 'es') {
-      selectedLanguage = 'Español';
-    } else if (savedLanguage == 'pt') {
-      selectedLanguage = 'Português';
-    } else if (savedLanguage == 'fr') {
-      selectedLanguage = 'Français';
-    } else if (savedLanguage == 'de') {
-      selectedLanguage = 'Deutsch';
-    } else if (savedLanguage == 'ru') { 
-      selectedLanguage = 'Русский';
-    } else if (savedLanguage == 'ja') {
-      selectedLanguage = '日本語';
-    } else if (savedLanguage == 'pa') {
-      selectedLanguage = 'ਪੰਜਾਬੀ';
-    } else if (savedLanguage == 'gu') {
-      selectedLanguage = 'ગુજરાતી';
-    } else if (savedLanguage == 'it') {
-      selectedLanguage = 'Italiano';
-    } else if (savedLanguage == 'ko') {
-      selectedLanguage = '한국어';
-    } else if (savedLanguage == 'zh') {
-      selectedLanguage = '中文';
-    } else {
-      selectedLanguage = 'English';
-    }
+    selectedLanguage = AppLocalizations.languageDisplayName(savedLanguage);
   }
 
   Future<void> _changeLanguage(String? language) async {
@@ -186,53 +123,10 @@ final List<String> languages = [
     });
     if (mounted) setState(() {});
 
-    String languageCode = 'en';
-    
-    if (language == 'हिंदी') {
-      languageCode = 'hi';
-    } else if (language == 'తెలుగు') {
-      languageCode = 'te';
-    } else if (language == 'தமிழ்') {
-      languageCode = 'ta';
-    } else if (language == 'मराठी') {
-      languageCode = 'mr';
-    } else if (language == 'ಕನ್ನಡ') {
-      languageCode = 'kn';
-    } else if (language == 'മലയാളം') {
-      languageCode = 'ml';
-    } else if (language == 'বাংলা') {
-      languageCode = 'bn';
-    } else if (language == 'العربية') {
-      languageCode = 'ar';
-    } else if (language == 'Español') {
-      languageCode = 'es';
-    } else if (language == 'Português') {
-      languageCode = 'pt';
-    } else if (language == 'Français') {
-      languageCode = 'fr';
-    } else if (language == 'Deutsch') {
-      languageCode = 'de';
-    } else if (language == 'Русский') {
-      languageCode = 'ru';
-    } else if (language == '日本語') {
-      languageCode = 'ja';
-    } else if (language == 'ਪੰਜਾਬੀ') {
-      languageCode = 'pa';
-    } else if (language == 'ગુજરાતી') {
-      languageCode = 'gu';
-    } else if (language == 'Italiano') {
-      languageCode = 'it';
-    } else if (language == '한국어') {
-      languageCode = 'ko';
-    } else if (language == '中文') {
-      languageCode = 'zh';
-    }
-
-    // Save and apply language
+    final languageCode = AppLocalizations.languageCodeFromDisplayName(language);
     await LocalStorageUtils.saveLanguage(languageCode);
     AppLocalizations.setLanguage(languageCode);
 
-    // Trigger rebuild
     if (mounted) setState(() {});
   }
 
@@ -287,7 +181,7 @@ final List<String> languages = [
       backgroundColor: Colors.transparent,
       builder: (context) => SelectionBottomSheet(
         title: AppLocalizations.language,
-        items: languages,
+        items: AppLocalizations.supportedLanguageDisplayNames,
         selectedItem: selectedLanguage,
       ),
     );
@@ -420,27 +314,7 @@ final List<String> languages = [
                   _user?.avatar ?? _user?.profilePicture ?? AppImages.av3;
               selectedCountry = _user?.country ?? selectedCountry;
               if (_user?.language != null) {
-                String code = _user!.language!;
-                if (code == 'hi') selectedLanguage = 'हिंदी';
-                else if (code == 'te') selectedLanguage = 'తెలుగు';
-                else if (code == 'ta') selectedLanguage = 'தமிழ்';
-                else if (code == 'mr') selectedLanguage = 'मराठी';
-                else if (code == 'kn') selectedLanguage = 'ಕನ್ನಡ';
-                else if (code == 'ml') selectedLanguage = 'മലയാളം';
-                else if (code == 'bn') selectedLanguage = 'বাংলা';
-                else if (code == 'ar') selectedLanguage = 'العربية';
-                else if (code == 'es') selectedLanguage = 'Español';
-                else if (code == 'pt') selectedLanguage = 'Português';
-                else if (code == 'fr') selectedLanguage = 'Français';
-                else if (code == 'de') selectedLanguage = 'Deutsch';
-                else if (code == 'ru') selectedLanguage = 'Русский';
-                else if (code == 'ja') selectedLanguage = '日本語';
-                else if (code == 'pa') selectedLanguage = 'ਪੰਜਾਬੀ';
-                else if (code == 'gu') selectedLanguage = 'ગુજરાતી';
-                else if (code == 'it') selectedLanguage = 'Italiano';
-                else if (code == 'ko') selectedLanguage = '한국어';
-                else if (code == 'zh') selectedLanguage = '中文';
-                else selectedLanguage = 'English'; // Default
+                selectedLanguage = AppLocalizations.languageDisplayName(_user!.language!);
               }
 
               // Set selectedAvatarIndex based on current avatar
@@ -617,7 +491,7 @@ final List<String> languages = [
                                   children: [
                                     Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                     SizedBox(width: 6.w),
-                                    Text('Please select an avatar', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                    Text(AppLocalizations.pleaseSelectAnAvatar, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                   ],
                                 ),
                               ),
@@ -654,7 +528,7 @@ final List<String> languages = [
                                       children: [
                                         Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                         SizedBox(width: 6.w),
-                                        Text('Please enter username', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                        Text(AppLocalizations.pleaseEnterUsername, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                       ],
                                     ),
                                   ],
@@ -671,7 +545,7 @@ final List<String> languages = [
                                   _buildGradientDropdown(
                                     hint: AppLocalizations.language,
                                     value: selectedLanguage,
-                                    items: languages,
+                                    items: AppLocalizations.supportedLanguageDisplayNames,
                                     isTablet: isTablet,
                                     prefixIcon: Padding(
                                       padding: EdgeInsets.all(12.w),
@@ -690,7 +564,7 @@ final List<String> languages = [
                                       children: [
                                         Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                         SizedBox(width: 6.w),
-                                        Text('Please select any language', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                        Text(AppLocalizations.pleaseSelectAnyLanguage, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                       ],
                                     ),
                                   ],
@@ -721,7 +595,7 @@ final List<String> languages = [
                                             children: [
                                               Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                               SizedBox(width: 6.w),
-                                              Text('Please select any country', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                              Text(AppLocalizations.pleaseSelectAnyCountry, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                             ],
                                           ),
                                         ],
@@ -750,7 +624,7 @@ final List<String> languages = [
                                             children: [
                                               Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                               SizedBox(width: 6.w),
-                                              Text('Please select any country', style: TextStyle(color: Colors.red, fontSize: 12.sp)),
+                                              Text(AppLocalizations.pleaseSelectAnyCountry, style: TextStyle(color: Colors.red, fontSize: 12.sp)),
                                             ],
                                           ),
                                         ],
@@ -869,49 +743,12 @@ final List<String> languages = [
 
     try {
       // Save language to shared preferences if changed
-      String languageCode = 'en';
+      final languageCode = selectedLanguage != null
+          ? AppLocalizations.languageCodeFromDisplayName(selectedLanguage!)
+          : 'en';
       if (selectedLanguage != null) {
-        if (selectedLanguage == 'हिंदी') {
-          languageCode = 'hi';
-        } else if (selectedLanguage == 'తెలుగు') {
-          languageCode = 'te';
-        } else if (selectedLanguage == 'தமிழ்') {
-          languageCode = 'ta';
-        } else if (selectedLanguage == 'मराठी') {
-          languageCode = 'mr';
-        } else if (selectedLanguage == 'ಕನ್ನಡ') {
-          languageCode = 'kn';
-        } else if (selectedLanguage == 'മലയാളം') {
-          languageCode = 'ml';
-        } else if (selectedLanguage == 'বাংলা') {
-          languageCode = 'bn';
-        } else if (selectedLanguage == 'العربية') {
-          languageCode = 'ar';
-        } else if (selectedLanguage == 'Español') {
-          languageCode = 'es';
-        } else if (selectedLanguage == 'Português') {
-          languageCode = 'pt';
-        } else if (selectedLanguage == 'Français') {
-          languageCode = 'fr';
-        } else if (selectedLanguage == 'Deutsch') {
-          languageCode = 'de';
-        } else if (selectedLanguage == 'Русский') {
-          languageCode = 'ru';
-        } else if (selectedLanguage == '日本語') {
-          languageCode = 'ja';
-        } else if (selectedLanguage == 'ਪੰਜਾਬੀ') {
-          languageCode = 'pa';
-        } else if (selectedLanguage == 'ગુજરાતી') {
-          languageCode = 'gu';
-        } else if (selectedLanguage == 'Italiano') {
-          languageCode = 'it';
-        } else if (selectedLanguage == '한국어') {
-          languageCode = 'ko';
-        } else if (selectedLanguage == '中文') {
-          languageCode = 'zh';
-        }
-          await LocalStorageUtils.saveLanguage(languageCode);
-          AppLocalizations.setLanguage(languageCode);
+        await LocalStorageUtils.saveLanguage(languageCode);
+        AppLocalizations.setLanguage(languageCode);
       }
 
       final result = await _userRepository.updateProfile(
@@ -937,7 +774,7 @@ final List<String> languages = [
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('${AppLocalizations.error}: $e')),
         );
       }
     } finally {
@@ -1271,7 +1108,7 @@ class _TabletAvatarSelectionSheetState extends State<_TabletAvatarSelectionSheet
                       ),
                       child: Center(
                         child: Text(
-                          'Choose photos',
+                          AppLocalizations.choosePhotos,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -1349,7 +1186,7 @@ class _TabletAvatarSelectionSheetState extends State<_TabletAvatarSelectionSheet
                         ),
                         SizedBox(height: 12.h),
                         Text(
-                          'Choose from gallery',
+                          AppLocalizations.chooseFromGallery,
                           style: TextStyle(
                             fontSize: 16.sp,
                             color: Colors.black87,
@@ -1359,7 +1196,7 @@ class _TabletAvatarSelectionSheetState extends State<_TabletAvatarSelectionSheet
                         TextButton(
                           onPressed: widget.onChoosePhoto,
                           child: Text(
-                            'Open gallery',
+                            AppLocalizations.openGallery,
                             style: TextStyle(fontSize: 16.sp),
                           ),
                         ),

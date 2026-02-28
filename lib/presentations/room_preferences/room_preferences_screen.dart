@@ -218,7 +218,7 @@ class _RoomPreferencesScreenState extends State<RoomPreferencesScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${AppLocalizations.error}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -374,7 +374,7 @@ class _RoomPreferencesScreenState extends State<RoomPreferencesScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Failed to create room: ${failure.message}'),
+                content: Text('${AppLocalizations.failedToCreateRoom}: ${failure.message}'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -394,7 +394,7 @@ class _RoomPreferencesScreenState extends State<RoomPreferencesScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${AppLocalizations.error}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -490,7 +490,7 @@ class _RoomPreferencesScreenState extends State<RoomPreferencesScreen> {
                                     Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                     SizedBox(width: 6.w),
                                     Text(
-                                      'Please select any language',
+                                      AppLocalizations.pleaseSelectAnyLanguage,
                                       style: TextStyle(color: Colors.red, fontSize: 12.sp),
                                     ),
                                   ],
@@ -510,7 +510,7 @@ class _RoomPreferencesScreenState extends State<RoomPreferencesScreen> {
                                     Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                     SizedBox(width: 6.w),
                                     Text(
-                                      'Please select any country',
+                                      AppLocalizations.pleaseSelectAnyCountry,
                                       style: TextStyle(color: Colors.red, fontSize: 12.sp),
                                     ),
                                   ],
@@ -532,7 +532,7 @@ class _RoomPreferencesScreenState extends State<RoomPreferencesScreen> {
                                     Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                     SizedBox(width: 6.w),
                                     Text(
-                                      'Please select any category',
+                                      AppLocalizations.pleaseSelectAnyCategory,
                                       style: TextStyle(color: Colors.red, fontSize: 12.sp),
                                     ),
                                   ],
@@ -556,7 +556,7 @@ class _RoomPreferencesScreenState extends State<RoomPreferencesScreen> {
                                     Icon(Icons.error_outline, color: Colors.red, size: 16.sp),
                                     SizedBox(width: 6.w),
                                     Text(
-                                      'Please select target points',
+                                      AppLocalizations.pleaseSelectTargetPoints,
                                       style: TextStyle(color: Colors.red, fontSize: 12.sp),
                                     ),
                                   ],

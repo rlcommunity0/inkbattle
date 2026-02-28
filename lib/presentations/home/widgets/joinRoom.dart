@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/constants/app_images.dart';
 import 'package:inkbattle_frontend/repositories/room_repository.dart';
 import 'package:inkbattle_frontend/repositories/user_repository.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class JoinRoomPopup extends StatefulWidget {
   const JoinRoomPopup({super.key});
@@ -122,7 +123,7 @@ class _JoinRoomPopupState extends State<JoinRoomPopup> {
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a room code'),
+          content: Text(AppLocalizations.pleaseEnterARoomCode),
           backgroundColor: Colors.orange,
         ),
       );
@@ -161,7 +162,7 @@ class _JoinRoomPopupState extends State<JoinRoomPopup> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Insufficient coins! You need $entryCost coins to join this room.'),
+                  AppLocalizations.translate('insufficient_coins_join_with_amount').replaceFirst('%s', entryCost.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -180,8 +181,8 @@ class _JoinRoomPopupState extends State<JoinRoomPopup> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Failed to join room: '
-                    '${failure.message.isNotEmpty ? failure.message : 'Please check the code and try again.'}'),
+                content: Text('${AppLocalizations.failedToJoinRoom}: '
+                    '${failure.message.isNotEmpty ? failure.message : AppLocalizations.pleaseCheckCode}'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -192,7 +193,7 @@ class _JoinRoomPopupState extends State<JoinRoomPopup> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                    'Successfully joined room! Entry cost: $entryCost coins'),
+                    '${AppLocalizations.successfullyJoinedRoomEntryCost}$entryCost ${AppLocalizations.coins}'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -206,7 +207,7 @@ class _JoinRoomPopupState extends State<JoinRoomPopup> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${AppLocalizations.error}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
