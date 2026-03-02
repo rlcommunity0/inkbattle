@@ -259,12 +259,12 @@ class _JoinRoomPopupState extends State<JoinRoomPopup> {
       padding: EdgeInsets.only(bottom: viewInsets.bottom),
       child: Center(
         child: Material(
-          color: Colors.transparent,
+          color: Colors.black,
           child: Container(
             width: dialogWidth,
             height: dialogHeight,
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 6, 9, 14),
+              color: Colors.black,
               borderRadius: BorderRadius.circular(25.r),
               border: Border.all(color: Colors.white, width: 3.0),
             ),

@@ -20,6 +20,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:inkbattle_frontend/presentations/profile_edit/widgets/tablet_avatar_selection_sheet.dart';
 
 class GuestSignUpScreen extends StatefulWidget {
   const GuestSignUpScreen({super.key});
@@ -236,18 +237,6 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
   }
 
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      setState(() {
-        selectedProfilePhoto = image.path; // Use path for local file
-        selectedAvatarIndex = -1; // Deselect preset avatars
-      });
-    }
-  }
-
   static const double _kTabletMaxWidth = 600;
 
   Widget _buildFirstPage() {
@@ -418,15 +407,17 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
                                   hintTextColor:
                                       const Color.fromRGBO(255, 255, 255, 0.52),
                                   hintText: AppLocalizations.enterUsername,
-                                  prefixIcon: Padding(
-                                    padding: EdgeInsets.all(10.w),
-                                    child: Icon(
-                                      Icons.person_outline,
-                                      color: const Color.fromRGBO(255, 255, 255, 0.52),
-                                      size: isTablet ? 24.sp : 21.sp,
+                                    contentPadding: EdgeInsets.symmetric(vertical: 0.h, horizontal: 0.w),
+                                    prefixIcon: Container(
+                                      width: isTablet ? 52.w : 48.w,
+                                      alignment: Alignment.center,
+                                      child: Icon(
+                                        Icons.person_outline,
+                                        color: const Color.fromRGBO(255, 255, 255, 0.52),
+                                        size: isTablet ? 24.sp : 20.sp,
+                                      ),
                                     ),
                                   ),
-                                ),
                                 if (_showFieldErrors && _usernameController.text.trim().isEmpty) ...[
                                   SizedBox(height: 4.h),
                                   Row(
@@ -453,14 +444,15 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
                                   value: selectedLanguage,
                                   items: AppLocalizations.supportedLanguageDisplayNames,
                                   isTablet: isTablet,
-                                  prefixIcon: Padding(
-                                    padding: EdgeInsets.all(12.w),
-                                    child: Icon(
-                                      Icons.language,
-                                      color: const Color.fromRGBO(255, 255, 255, 0.52),
-                                      size: isTablet ? 24.sp : 21.sp,
+                                    prefixIcon: Container(
+                                      width: isTablet ? 52.w : 48.w,
+                                      alignment: Alignment.center,
+                                      child: Icon(
+                                        Icons.language,
+                                        color: const Color.fromRGBO(255, 255, 255, 0.52),
+                                        size: isTablet ? 24.sp : 20.sp,
+                                      ),
                                     ),
-                                  ),
                                   onChanged: (val) => _changeLanguage(val),
                                 ),
                                 if (_showFieldErrors && selectedLanguage == null) ...[
@@ -830,11 +822,9 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
   }
 
   void _showTabletAvatarSelectionSheet() {
-    showModalBottomSheet<void>(
+    showDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _TabletAvatarSelectionSheet(
+      builder: (context) => TabletAvatarSelectionSheet(
         avatarsURLs: avatarsURLs,
         selectedAvatarIndex: selectedAvatarIndex,
         selectedProfilePhoto: selectedProfilePhoto,
@@ -842,11 +832,6 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
           _selectAvatar(index);
           Navigator.pop(context);
         },
-        onChoosePhoto: () {
-          Navigator.pop(context);
-          _pickImage();
-        },
-        onBack: () => Navigator.pop(context),
       ),
     );
   }
@@ -895,6 +880,7 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
     final isFilled = countryCode != null && countryCode.isNotEmpty;
     // Exactly matching the language dropdown style
     return Container(
+      height: 60.h,
       alignment: Alignment.center,
       padding: EdgeInsets.all(2.w),
       decoration: BoxDecoration(
@@ -917,52 +903,52 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
               borderRadius: BorderRadius.circular(13.r),
               color: Colors.black,
             ),
-             child: Padding(  // Add padding for consistent height/alignment
-              padding: EdgeInsets.symmetric(vertical: 2.h), // Adjust as needed
-              child: Row(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (!isFilled)
-                  Padding(
-                    padding: EdgeInsets.all(12.w),
+                if (!isFilled) ...[
+                  Container(
+                    width: 52.w,
+                    alignment: Alignment.center,
                     child: Icon(
                       Icons.public,
                       color: const Color.fromRGBO(255, 255, 255, 0.52),
                       size: 24.sp,
                     ),
                   ),
-                if (!isFilled) SizedBox(width: 8.w),
-                Expanded(
-                  child: Padding( // Add padding for text
-                    padding: EdgeInsets.only(left: isFilled ? 12.w : 0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                        if (isFilled) ...[
-                          Text(CountryPickerWidget.getCountryFlag(countryCode), style: TextStyle(fontSize: 24.sp)), // Larger flag on tablet
-                          SizedBox(width: 8.w),
-                        ],
-                        Expanded(child: Text(
-                          displayText,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isFilled ? Colors.white : const Color.fromRGBO(255, 255, 255, 0.52),
-                            fontSize: 18.sp,
-                          ),
-                        )),
-                      ],
+                ],
+                if (isFilled) ...[
+                  Container(
+                    width: 52.w,
+                    alignment: Alignment.center,
+                    child: Text(
+                      CountryPickerWidget.getCountryFlag(countryCode),
+                      style: TextStyle(fontSize: 24.sp),
                     ),
                   ),
+                ],
+                Expanded(
+                  child: Text(
+                    displayText,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: isFilled ? Colors.white : const Color.fromRGBO(255, 255, 255, 0.52),
+                      fontSize: 20.sp,
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(right: 8.w),
-                  child: Icon(Icons.arrow_drop_down, size: 35.sp, color: const Color.fromRGBO(9, 189, 255, 1)),
+                Container(
+                  width: 52.w,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 24.sp,
+                    color: const Color.fromRGBO(9, 189, 255, 1),
+                  ),
                 ),
               ],
             ),
-          ),
           ),
         ),
       ),
@@ -1038,6 +1024,7 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
     return Builder(
       builder: (context) {
         return Container(
+          height: isTablet ? 60.h : 50.h,
           alignment: Alignment.center,
           padding: EdgeInsets.all(2.w),
           decoration: BoxDecoration(
@@ -1056,7 +1043,6 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
               borderRadius: BorderRadius.circular(13.r),
               onTap: () async {
                 await _showLanguageBottomSheet();
-                // Removed popup menu logic as we are now using bottom sheet for both mobile and tablet
               },
               child: Container(
                 alignment: Alignment.center,
@@ -1065,28 +1051,30 @@ class _GuestSignUpScreenState extends State<GuestSignUpScreen>
                   color: Colors.black,
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     prefixIcon,
-                    SizedBox(width: 8.w),
                     Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          value ?? hint,
-                          style: TextStyle(
-                            color: value == null
-                                ? const Color.fromRGBO(255, 255, 255, 0.52)
-                                : Colors.white,
-                            fontSize: 18.sp,
-                          ),
+                      child: Text(
+                        value ?? hint,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: value == null
+                              ? const Color.fromRGBO(255, 255, 255, 0.52)
+                              : Colors.white,
+                          fontSize: isTablet ? 20.sp : 18.sp,
                         ),
                       ),
                     ),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      size: 35.sp,
-                      color: const Color.fromRGBO(9, 189, 255, 1),
+                    Container(
+                      width: isTablet ? 52.w : 48.w,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: isTablet ? 24.sp : 20.sp,
+                        color: const Color.fromRGBO(9, 189, 255, 1),
+                      ),
                     ),
                   ],
                 ),
@@ -1333,180 +1321,3 @@ class _CountrySelectionBottomSheetState extends State<_CountrySelectionBottomShe
     );
   }
 }
-
-/// Figma-style avatar selection bottom sheet (tablet): Avatars tab + Choose photos tab, grid layout.
-class _TabletAvatarSelectionSheet extends StatefulWidget {
-  final List<String> avatarsURLs;
-  final int selectedAvatarIndex;
-  final String? selectedProfilePhoto;
-  final ValueChanged<int> onAvatarSelected;
-  final VoidCallback onChoosePhoto;
-  final VoidCallback onBack;
-
-  const _TabletAvatarSelectionSheet({
-    required this.avatarsURLs,
-    required this.selectedAvatarIndex,
-    required this.selectedProfilePhoto,
-    required this.onAvatarSelected,
-    required this.onChoosePhoto,
-    required this.onBack,
-  });
-
-  @override
-  State<_TabletAvatarSelectionSheet> createState() => _TabletAvatarSelectionSheetState();
-}
-
-class _TabletAvatarSelectionSheetState extends State<_TabletAvatarSelectionSheet> {
-  int _tabIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE5E5E5),
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(20.r), topRight: Radius.circular(20.r)),
-      ),
-      child: Column(
-        children: [
-          SizedBox(height: 12.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-            child: Row(
-              children: [
-                const Spacer(),
-                GestureDetector(
-                  onTap: widget.onBack,
-                  child: Text(
-                    'Back',
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _tabIndex = 0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: _tabIndex == 0 ? Colors.black : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Avatars',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: _tabIndex == 0 ? Colors.white : Colors.black87,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _tabIndex = 1),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: _tabIndex == 1 ? Colors.black : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          AppLocalizations.choosePhotos,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: _tabIndex == 1 ? Colors.white : Colors.black87,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 4.h),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 16.w),
-            height: 1.h,
-            color: Colors.black26,
-          ),
-          SizedBox(height: 16.h),
-          Expanded(
-            child: _tabIndex == 0
-                ? Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12.h,
-                        crossAxisSpacing: 12.w,
-                        childAspectRatio: 0.9,
-                      ),
-                      itemCount: widget.avatarsURLs.length,
-                      itemBuilder: (context, index) {
-                        final isSelected = index == widget.selectedAvatarIndex;
-                        return GestureDetector(
-                          onTap: () => widget.onAvatarSelected(index),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: isSelected ? Border.all(color: const Color(0xFF09BDFF), width: 3) : null,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.r),
-                              child: Padding(
-                                padding: EdgeInsets.all(8.w),
-                                child: Image.asset(widget.avatarsURLs[index], fit: BoxFit.contain),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.photo_library_outlined, size: 48.sp, color: Colors.grey),
-                        SizedBox(height: 12.h),
-                        Text(AppLocalizations.chooseFromGallery, style: TextStyle(fontSize: 16.sp, color: Colors.black87)),
-                        SizedBox(height: 16.h),
-                        TextButton(
-                          onPressed: widget.onChoosePhoto,
-                          child: Text(AppLocalizations.openGallery, style: TextStyle(fontSize: 16.sp)),
-                        ),
-                      ],
-                    ),
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-
