@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inkbattle_frontend/constants/app_colors.dart';
@@ -17,10 +16,8 @@ import 'package:video_player/video_player.dart';
 import 'package:inkbattle_frontend/utils/lang.dart';
 import 'package:inkbattle_frontend/presentations/profile_edit/widgets/profile_country_field.dart';
 import 'package:inkbattle_frontend/presentations/room_preferences/widgets/selection_bottom_sheet.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:inkbattle_frontend/presentations/profile_edit/widgets/tablet_avatar_selection_sheet.dart';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({
     super.key,
@@ -32,7 +29,6 @@ class ProfileEditScreen extends StatefulWidget {
 
 class _ProfileEditScreenState extends State<ProfileEditScreen>
     with TickerProviderStateMixin {
-  final String _logTag = 'ProfileEditScreen';
   final UserRepository _userRepository = UserRepository();
   bool nameLoaded = false;
   bool profileLoaded = false;
@@ -56,59 +52,10 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
   ];
 
   late AnimationController _controller;
-  late AnimationController _avatarMoveController;
-  late List<Animation<Offset>> _coinDrops;
-  late Animation<double> _textOpacity;
   VideoPlayerController? _videoController;
   final random = Random();
 
   // Avatar swipe animation variables
-  late AnimationController _avatarSwipeController;
-  int _previousAvatarIndex = 0;
-  double _swipeOffset = 0.0;
-  bool _isSwiping = false;
-
-// Countries are now handled via CountryPickerWidget with ISO-2 codes
-
-  void _onAvatarSwipeLeft() {
-    if (_isSwiping) return;
-    
-    setState(() {
-      _isSwiping = true;
-      _previousAvatarIndex = selectedAvatarIndex;
-      selectedAvatarIndex = (selectedAvatarIndex + 1) % avatarsURLs.length;
-      selectedProfilePhoto = avatarsURLs[selectedAvatarIndex];
-    });
-    
-    _avatarSwipeController.forward(from: 0.0).then((_) {
-      if (mounted) {
-        setState(() {
-          _isSwiping = false;
-          _swipeOffset = 0.0;
-        });
-      }
-    });
-  }
-
-  void _onAvatarSwipeRight() {
-    if (_isSwiping) return;
-    
-    setState(() {
-      _isSwiping = true;
-      _previousAvatarIndex = selectedAvatarIndex;
-      selectedAvatarIndex = (selectedAvatarIndex - 1 + avatarsURLs.length) % avatarsURLs.length;
-      selectedProfilePhoto = avatarsURLs[selectedAvatarIndex];
-    });
-    
-    _avatarSwipeController.forward(from: 0.0).then((_) {
-      if (mounted) {
-        setState(() {
-          _isSwiping = false;
-          _swipeOffset = 0.0;
-        });
-      }
-    });
-  }
 
   void _loadLanguage() {
     final savedLanguage = LocalStorageUtils.getLanguage();
@@ -130,30 +77,10 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
     if (mounted) setState(() {});
   }
 
-  void _selectAvatar(int index) {
-    setState(() {
-      selectedAvatarIndex = index;
-      selectedProfilePhoto = avatarsURLs[index];
-    });
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null && mounted) {
-      setState(() {
-        selectedProfilePhoto = image.path;
-        selectedAvatarIndex = -1;
-      });
-    }
-  }
-
   void _showTabletAvatarSelectionSheet() {
-    showModalBottomSheet<void>(
+    showDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _TabletAvatarSelectionSheet(
+      builder: (context) => TabletAvatarSelectionSheet(
         avatarsURLs: avatarsURLs,
         selectedAvatarIndex: selectedAvatarIndex >= 0 && selectedAvatarIndex < avatarsURLs.length ? selectedAvatarIndex : 0,
         selectedProfilePhoto: selectedProfilePhoto,
@@ -164,11 +91,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
           });
           Navigator.pop(context);
         },
-        onChoosePhoto: () {
-          Navigator.pop(context);
-          _pickImage();
-        },
-        onBack: () => Navigator.pop(context),
       ),
     );
   }
@@ -231,17 +153,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
       }
     });
 
-    // Avatar swipe animation controller
-    _avatarSwipeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _coinDrops = [];
-    _textOpacity = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.80, 1.0, curve: Curves.easeIn),
-    );
     _initializeVideo();
   }
 
@@ -257,30 +168,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final random = Random();
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final stackWidth = screenWidth * 0.6;
-    final stackHeight = screenHeight * 0.4;
-    final childSize = screenWidth * 0.1;
-    final radius = min(stackWidth, stackHeight) * 0.15;
-
-    _coinDrops = List.generate(20, (i) {
-      final angle =
-          (i * 2 * pi / 20) + (random.nextDouble() * pi / 10 - pi / 20);
-      final endDx = (radius * cos(angle)) / childSize;
-      final endDy = (radius * sin(angle)) / childSize;
-      final beginDx = random.nextDouble() * 4 - 2;
-      final beginDy = -(stackHeight / childSize) - (random.nextDouble() * 2);
-
-      return Tween<Offset>(
-        begin: Offset(beginDx, beginDy),
-        end: Offset(endDx, endDy),
-      ).animate(CurvedAnimation(
-        parent: _controller,
-        curve: Interval(i * 0.05, 1.0, curve: Curves.easeOut),
-      ));
-    });
   }
 
   @override
@@ -289,7 +176,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
     _usernameFocusNode.dispose();
     _pageController.dispose();
     _controller.dispose();
-    _avatarSwipeController.dispose();
     _videoController?.dispose();
     super.dispose();
   }
@@ -420,42 +306,40 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
                                   alignment: Alignment.center,
                                   clipBehavior: Clip.none,
                                   children: [
-                                    Container(
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: _showTabletAvatarSelectionSheet,
-                                        child: Container(
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: _showTabletAvatarSelectionSheet,
+                                    child: Container(
+                                      clipBehavior: Clip.hardEdge,
+                                      height: isTablet ? 160.h : 120.h,
+                                      width: isTablet ? 160.w : 120.w,
+                                      padding: EdgeInsets.all(2.w),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Color(0xFF09BDFF),
+                                            Color(0xFF6FE4FF),
+                                            Color(0xFFFFFFFF),
+                                          ],
+                                        ),
+                                      ),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black,
+                                        ),
+                                        child: ClipOval(
                                           clipBehavior: Clip.hardEdge,
-                                          height: isTablet ? 160.h : 120.h,
-                                          width: isTablet ? 160.w : 120.w,
-                                          padding: EdgeInsets.all(2.w),
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Color(0xFF09BDFF),
-                                                Color(0xFF6FE4FF),
-                                                Color(0xFFFFFFFF),
-                                              ],
-                                            ),
-                                          ),
-                                          child: Container(
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.black,
-                                            ),
-                                            child: ClipOval(
-                                              clipBehavior: Clip.hardEdge,
-                                              child: SizedBox(
-                                                width: isTablet ? 150.r : 110.r,
-                                                height: isTablet ? 150.r : 110.r,
-                                                child: _buildAvatarImage(isTablet),
-                                              ),
-                                            ),
+                                          child: SizedBox(
+                                            width: isTablet ? 150.r : 110.r,
+                                            height: isTablet ? 150.r : 110.r,
+                                            child: _buildAvatarImage(isTablet),
                                           ),
                                         ),
                                       ),
                                     ),
+                                  ),
                                     Positioned(
                                       bottom: isTablet ? 10.h : 0.h,
                                       right: isTablet ? 0 : 0.w,
@@ -512,12 +396,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
                                     fontSize: isTablet ? 20.sp : 18.sp,
                                     hintTextColor: const Color.fromRGBO(255, 255, 255, 0.52),
                                     hintText: AppLocalizations.enterUsername,
-                                    prefixIcon: Padding(
-                                      padding: EdgeInsets.all(10.w),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 0.h, horizontal: 0.w),
+                                    prefixIcon: Container(
+                                      width: isTablet ? 52.w : 48.w,
+                                      alignment: Alignment.center,
                                       child: Icon(
                                         Icons.person_outline,
                                         color: const Color.fromRGBO(255, 255, 255, 0.52),
-                                        size: isTablet ? 24.sp : 21.sp,
+                                        size: isTablet ? 24.sp : 20.sp,
                                       ),
                                     ),
                                   ),
@@ -547,14 +433,15 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
                                     value: selectedLanguage,
                                     items: AppLocalizations.supportedLanguageDisplayNames,
                                     isTablet: isTablet,
-                                    prefixIcon: Padding(
-                                      padding: EdgeInsets.all(12.w),
-                                      child: Icon(
-                                        Icons.language,
-                                        color: const Color.fromRGBO(255, 255, 255, 0.52),
-                                        size: isTablet ? 24.sp : 21.sp,
+                                      prefixIcon: Container(
+                                        width: isTablet ? 52.w : 48.w,
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          Icons.language,
+                                          color: const Color.fromRGBO(255, 255, 255, 0.52),
+                                          size: isTablet ? 24.sp : 20.sp,
+                                        ),
                                       ),
-                                    ),
                                     onChanged: (val) => _changeLanguage(val),
                                   ),
                                   if (_showFieldErrors && selectedLanguage == null) ...[
@@ -676,50 +563,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
     );
   }
 
-  Widget _buildAvatarCircle(String avatarPath, bool isTablet, double contentWidth) {
-    return Container(
-      height: isTablet ? 180.h : 150.h,
-      width: isTablet ? 180.w : 150.w,
-      padding: EdgeInsets.all(2.w),
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF09BDFF),
-            Color(0xFF6FE4FF),
-            Color(0xFFFFFFFF),
-          ],
-        ),
-      ),
-      child: Container(
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.black,
-        ),
-        child: ClipOval(
-          child: SizedBox(
-            width: isTablet ? 170.r : 140.r,
-            height: isTablet ? 170.r : 140.r,
-            child: Padding(
-              padding: EdgeInsets.all(isTablet ? 30.0 : 24.0),
-              child: Image.asset(
-                avatarPath,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  // Fallback to av3.png if image fails to load
-                  return Image.asset(
-                    AppImages.av3,
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   // Check if all required fields are filled
   bool _areAllFieldsFilled() {
     final nameInput = _usernameController.text.trim();
@@ -794,6 +637,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
     return Builder(
       builder: (context) {
         return Container(
+          height: isTablet ? 60.h : 50.h,
           alignment: Alignment.center,
           padding: EdgeInsets.all(2.w),
           decoration: BoxDecoration(
@@ -811,94 +655,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
               key: tapKey,
               borderRadius: BorderRadius.circular(13.r),
               onTap: () async {
-                if (isTablet) {
-                  await _showLanguageBottomSheet();
-                  return;
-                }
-                final box =
-                    tapKey.currentContext!.findRenderObject() as RenderBox;
-                final Offset pos = box.localToGlobal(Offset.zero);
-                final Size size = box.size;
-                const double gap = -2.0;
-                final selected = await showMenu<String>(
-                  context: context,
-                  position: RelativeRect.fromLTRB(
-                      pos.dx,
-                      pos.dy + size.height + gap,
-                      pos.dx + size.width,
-                      pos.dy + size.height + gap),
-                  color: Colors.transparent,
-                  constraints: BoxConstraints(
-                    minWidth: size.width,
-                    maxWidth: size.width,
-                  ),
-                  items: [
-                    PopupMenuItem<String>(
-                      enabled: false,
-                      padding: EdgeInsets.zero,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.r),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color.fromRGBO(255, 255, 255, 1),
-                              Color.fromRGBO(9, 189, 255, 1)
-                            ],
-                          ),
-                        ),
-                        padding: EdgeInsets.all(2.w),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.r),
-                            color: Colors.black,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: items.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final e = entry.value;
-                              return Container(
-                                decoration: BoxDecoration(
-                                  border: index < items.length - 1
-                                      ? const Border(
-                                          bottom: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  255, 255, 255, 0.2),
-                                              width: 3))
-                                      : null,
-                                ),
-                                child: InkWell(
-                                  onTap: () => Navigator.pop(context, e),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12.w,
-                                      vertical: 12.h,
-                                    ),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          e,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18.sp,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-                if (selected != null) onChanged(selected);
+                await _showLanguageBottomSheet();
               },
               child: Container(
                 alignment: Alignment.center,
@@ -907,28 +664,30 @@ class _ProfileEditScreenState extends State<ProfileEditScreen>
                   color: Colors.black,
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     prefixIcon,
-                    SizedBox(width: 8.w),
                     Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          value ?? hint,
-                          style: TextStyle(
-                            color: value == null
-                                ? const Color.fromRGBO(255, 255, 255, 0.52)
-                                : Colors.white,
-                            fontSize: 18.sp,
-                          ),
+                      child: Text(
+                        value ?? hint,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: value == null
+                              ? const Color.fromRGBO(255, 255, 255, 0.52)
+                              : Colors.white,
+                          fontSize: isTablet ? 20.sp : 18.sp,
                         ),
                       ),
                     ),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      size: 35.sp,
-                      color: const Color.fromRGBO(9, 189, 255, 1),
+                    Container(
+                      width: isTablet ? 52.w : 48.w,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: isTablet ? 24.sp : 20.sp,
+                        color: const Color.fromRGBO(9, 189, 255, 1),
+                      ),
                     ),
                   ],
                 ),

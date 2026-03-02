@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:inkbattle_frontend/presentations/home/widgets/adsFree.dart';
 import 'package:inkbattle_frontend/presentations/home/widgets/button.dart';
@@ -205,7 +206,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     required bool isTablet,
     required double size,
   }) {
-    final buttonSize = isTablet ? size * 0.32 : size * 0.3;
+    // Slightly larger circle so coinsss image appears a bit bigger (Figma)
+    final buttonSize = isTablet ? size * 0.36 : size * 0.34;
     return Material(
       color: Colors.transparent,
       shape: const CircleBorder(),
@@ -221,20 +223,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             clipBehavior: Clip.none,
             alignment: Alignment.center,
             children: [
-              Image.asset(
-                AppImages.coinsss,
-                fit: BoxFit.contain,
+              // Background image first, then text overlays (Figma order)
+              Container(
                 width: buttonSize,
                 height: buttonSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: const AssetImage(AppImages.coinsss),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
               child,
+              // Red notification at top-right, slightly overlapping (Figma)
               if (showNotification)
                 Positioned(
-                  top: -2,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
+                  top: -4,
+                  right: -4,
+                  child: Container(
                     width: isTablet ? 14.r : 10.r,
                     height: isTablet ? 14.r : 10.r,
                     decoration: BoxDecoration(
@@ -249,12 +256,44 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ],
                     ),
                   ),
-                  ),
                 ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  /// Same font and style as Play Random / Multiplayer / Friends (CustomRoomButton).
+  Widget _buildCircleButtonText(String text, bool isTablet) {
+    final double textSize = isTablet ? 14.sp : 14.sp;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.luckiestGuy(
+            fontSize: textSize,
+            fontWeight: FontWeight.w400,
+            height: 1.15,
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 2
+              ..color = Colors.black,
+          ),
+        ),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.luckiestGuy(
+            fontSize: textSize,
+            fontWeight: FontWeight.w400,
+            height: 1.15,
+            color: Colors.white,
+          ),
+        ),
+      ],
     );
   }
 
@@ -344,12 +383,25 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 child: LayoutBuilder(
                                   builder: (context, constraints) {
                                     // Base calculation on width, but FittedBox will override if height is tight
-                                    double circleSize = isTablet ? 0.45.sw : 0.7.sw;
+                                    double circleSize = isTablet ? 0.47.sw : 0.8.sw;
                                     circleSize = circleSize.clamp(
                                         isTablet ? 320 : 200, isTablet ? 500 : 400);
 
-                                    // Keep your existing Stack/Logo code exactly as is
+                                    // Math for button placement on edge of circle (match _buildCircleButton size)
+                                    double radius = circleSize / 2;
+                                    double buttonSize = isTablet ? circleSize * 0.36 : circleSize * 0.34;
+                                    double buttonRadius = buttonSize / 2;
+
+                                    // Top left (Get Daily Coins) at 135 degrees (from 3 o'clock, CCW)
+                                    double leftTL = radius + radius * (-0.7071) - buttonRadius;
+                                    double topTL = radius + radius * (-0.7071) - buttonRadius;
+
+                                    // Bottom right (Ads Free) at 25 degrees (from 3 o'clock, CW is down)
+                                    double leftBR = radius + radius * 0.9063 - buttonRadius;
+                                    double topBR = radius + radius * 0.4226 - buttonRadius;
+
                                     return Stack(
+                                      clipBehavior: Clip.none,
                                       alignment: Alignment.center,
                                       children: [
                                         Container(
@@ -369,7 +421,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                   blurRadius: 30,
                                                   spreadRadius: 6,
                                                 ),
-
                                                 // Soft ambient glow
                                                 BoxShadow(
                                                   color: const Color(0xFF00E5FF).withOpacity(0.3),
@@ -387,10 +438,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                               ),
                                             ),
                                           ),
-                                        // Daily Coins Button - inside container
+                                        // Daily Coins Button
                                         Positioned(
-                                          left: circleSize * 0.04,
-                                          top: circleSize * 0.04,
+                                          left: leftTL,
+                                          top: topTL,
                                           child: _buildCircleButton(
                                             isTablet: isTablet,
                                             size: circleSize,
@@ -415,66 +466,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                               ),
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      'GET',
-                                                      style: TextStyle(
-                                                        fontSize: isTablet ? 11.sp : 9.sp,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Colors.white,
-                                                        shadows: const [
-                                                          Shadow(
-                                                            blurRadius: 2.5,
-                                                            color: Colors.black,
-                                                            offset: Offset(1.5, 1.5),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'DAILY',
-                                                      style: TextStyle(
-                                                        fontSize: isTablet ? 11.sp : 9.sp,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Colors.white,
-                                                        shadows: const [
-                                                          Shadow(
-                                                            blurRadius: 2.5,
-                                                            color: Colors.black,
-                                                            offset: Offset(1.5, 1.5),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'COINS',
-                                                      style: TextStyle(
-                                                        fontSize: isTablet ? 11.sp : 9.sp,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Colors.white,
-                                                        shadows: const [
-                                                          Shadow(
-                                                            blurRadius: 2.5,
-                                                            color: Colors.black,
-                                                            offset: Offset(1.5, 1.5),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
+                                                child: _buildCircleButtonText(
+                                                  'GET\nDAILY\nCOINS',
+                                                  isTablet,
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                        // Ads Free Button - inside container
+                                        // Ads Free Button
                                         Positioned(
-                                          right: circleSize * 0.04,
-                                          bottom: circleSize * 0.04,
+                                          left: leftBR,
+                                          top: topBR,
                                           child: _buildCircleButton(
                                             isTablet: isTablet,
                                             size: circleSize,
@@ -508,48 +511,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                               ),
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      'ADS',
-                                                      style: TextStyle(
-                                                        fontSize: isTablet ? 15.sp : 12.sp,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Colors.white,
-                                                        shadows: const [
-                                                          Shadow(
-                                                            blurRadius: 2.5,
-                                                            color: Colors.black,
-                                                            offset: Offset(1.5, 1.5),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'FREE',
-                                                      style: TextStyle(
-                                                        fontSize: isTablet ? 15.sp : 12.sp,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Colors.white,
-                                                        shadows: const [
-                                                          Shadow(
-                                                            blurRadius: 2.5,
-                                                            color: Colors.black,
-                                                            offset: Offset(1.5, 1.5),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
+                                                child: _buildCircleButtonText(
+                                                  'ADS\nFREE',
+                                                  isTablet,
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-
                                       ],
                                     );
                                   },

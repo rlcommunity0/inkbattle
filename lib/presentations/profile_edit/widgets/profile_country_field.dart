@@ -53,106 +53,8 @@ class ProfileCountryField extends StatelessWidget {
     final displayText = countryName ?? hintText;
     final isFilled = countryCode != null && countryCode.isNotEmpty;
 
-    if (isTablet) {
-      return _buildTabletButton(context, displayText, isFilled, countryCode);
-    }
-    return _buildPhoneButton(context, displayText, isFilled, countryCode);
-  }
-
-  Widget _buildPhoneButton(
-    BuildContext context,
-    String displayText,
-    bool isFilled,
-    String? countryCode,
-  ) {
     return Container(
-      alignment: Alignment.center,
-      height: 50.h,
-      padding: const EdgeInsets.all(1.2),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15.r),
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromRGBO(255, 255, 255, 0.8),
-            Color.fromRGBO(9, 189, 255, 0.8),
-          ],
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(13.r),
-          onTap: () => _showCountryPicker(context),
-          child: Container(
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(13.r),
-              color: Colors.black.withOpacity(0.7),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (!isFilled) ...[
-                  Padding(
-                    padding: EdgeInsets.only(right: 8.w),
-                    child: Icon(
-                      Icons.public,
-                      color: const Color.fromRGBO(255, 255, 255, 0.52),
-                      size: 21.sp,
-                    ),
-                  ),
-                ],
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (isFilled) ...[
-                        Text(
-                          CountryPickerWidget.getCountryFlag(countryCode),
-                          style: TextStyle(fontSize: 18.sp),
-                        ),
-                        SizedBox(width: 8.w),
-                      ],
-                      Expanded(
-                        child: Text(
-                          displayText,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: isFilled
-                                ? Colors.white
-                                : const Color.fromRGBO(255, 255, 255, 0.52),
-                            fontSize: 18.sp,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Image.asset(
-                  AppImages.dropdownIcon,
-                  width: 24.w,
-                  height: 24.h,
-                  fit: BoxFit.contain,
-                  color: const Color(0xFF09BDFF),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabletButton(
-    BuildContext context,
-    String displayText,
-    bool isFilled,
-    String? countryCode,
-  ) {
-    return Container(
+      height: isTablet ? 60.h : 50.h,
       alignment: Alignment.center,
       padding: EdgeInsets.all(2.w),
       decoration: BoxDecoration(
@@ -171,7 +73,6 @@ class ProfileCountryField extends StatelessWidget {
           onTap: () => _showCountryPicker(context),
           child: Container(
             alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13.r),
               color: Colors.black,
@@ -180,49 +81,45 @@ class ProfileCountryField extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (!isFilled) ...[
-                  Padding(
-                    padding: EdgeInsets.only(right: 8.w),
+                  Container(
+                    width: isTablet ? 52.w : 48.w,
+                    alignment: Alignment.center,
                     child: Icon(
                       Icons.public,
                       color: const Color.fromRGBO(255, 255, 255, 0.52),
-                      size: 24.sp,
+                      size: isTablet ? 24.sp : 20.sp,
+                    ),
+                  ),
+                ],
+                if (isFilled) ...[
+                  Container(
+                    width: isTablet ? 52.w : 48.w,
+                    alignment: Alignment.center,
+                    child: Text(
+                      CountryPickerWidget.getCountryFlag(countryCode),
+                      style: TextStyle(fontSize: isTablet ? 24.sp : 20.sp),
                     ),
                   ),
                 ],
                 Expanded(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (isFilled) ...[
-                        Text(
-                          CountryPickerWidget.getCountryFlag(countryCode),
-                          style: TextStyle(fontSize: 18.sp),
-                        ),
-                        SizedBox(width: 8.w),
-                      ],
-                      Expanded(
-                        child: Text(
-                          displayText,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isFilled
-                                ? Colors.white
-                                : const Color.fromRGBO(255, 255, 255, 0.52),
-                            fontSize: 18.sp,
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    displayText,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: isFilled ? Colors.white : const Color.fromRGBO(255, 255, 255, 0.52),
+                      fontSize: isTablet ? 20.sp : 18.sp,
+                    ),
                   ),
                 ),
-                SizedBox(width: 8.w),
-                Image.asset(
-                  AppImages.dropdownIcon,
-                  width: 28.w,
-                  height: 28.h,
-                  fit: BoxFit.contain,
-                  color: const Color(0xFF09BDFF),
+                Container(
+                  width: isTablet ? 52.w : 48.w,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: isTablet ? 24.sp : 20.sp,
+                    color: const Color(0xFF09BDFF),
+                  ),
                 ),
               ],
             ),

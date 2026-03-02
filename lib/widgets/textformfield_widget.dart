@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/app_colors.dart';
-
 class TextformFieldWidget extends StatefulWidget {
   const TextformFieldWidget({
     super.key,
@@ -65,9 +65,9 @@ class _TextformFieldWidgetState extends State<TextformFieldWidget> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      padding: const EdgeInsets.all(2),
+      padding: EdgeInsets.all(2.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(15.r),
         gradient: const LinearGradient(
           colors: [
             Color.fromRGBO(255, 255, 255, 1),
@@ -78,11 +78,12 @@ class _TextformFieldWidgetState extends State<TextformFieldWidget> {
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(13),
+          borderRadius: BorderRadius.circular(13.r),
           color: Colors.black,
         ),
         height: widget.height,
         child: TextFormField(
+          textAlignVertical: TextAlignVertical.center,
           maxLines: widget.maxLine ?? 1,
           obscureText: widget.obscureText ?? false,
           initialValue: widget.initialValue,
@@ -99,7 +100,8 @@ class _TextformFieldWidgetState extends State<TextformFieldWidget> {
               fontWeight: widget.fontWeight,
               color: widget.textColor),
           decoration: InputDecoration(
-            contentPadding: widget.contentPadding ?? const EdgeInsets.all(10),
+            isDense: true,
+            contentPadding: widget.contentPadding ?? EdgeInsets.symmetric(horizontal: 10.w, vertical: 15.h),
             hintText: widget.hintText,
             suffixIcon: widget.suffixIcon,
             prefixIcon: widget.prefixIcon,

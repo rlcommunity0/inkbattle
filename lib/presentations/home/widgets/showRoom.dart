@@ -47,7 +47,10 @@ class RoomPopup extends StatelessWidget {
                       text: AppLocalizations.joinRoom.toUpperCase(),
                       onPressed: () {
                         showDialog(
-                            context: context, builder: (_) => const JoinRoomPopup());
+                          context: context,
+                          barrierColor: Colors.black,
+                          builder: (_) => const JoinRoomPopup(),
+                        );
                       },
                     ),
                   ],

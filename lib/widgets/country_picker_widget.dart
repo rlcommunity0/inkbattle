@@ -85,7 +85,7 @@ class CountryPickerWidget extends StatelessWidget {
         width: width,
         height: height ?? (isTablet ? 60.h : 50.h),
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(1.2),
+        padding: EdgeInsets.all(2.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.r),
           gradient: const LinearGradient(
@@ -109,66 +109,62 @@ class CountryPickerWidget extends StatelessWidget {
                 color: Colors.black,
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Only show icon/image if NOT filled (selected)
                   if (!isFilled) ...[
                     if (imageUrl != null) ...[
-                      Padding(
-                        padding: EdgeInsets.all(12.w),
+                      Container(
+                        width: isTablet ? 52.w : 48.w,
+                        alignment: Alignment.center,
                         child: CustomSvgImage(
                           imageUrl: imageUrl!,
-                          height: isTablet ? 24.h : 21.h,
-                          width: isTablet ? 24.w : 21.w,
+                          height: isTablet ? 24.h : 20.h,
+                          width: isTablet ? 24.w : 20.w,
                           color: iconColor,
                         ),
                       ),
-                      SizedBox(width: 8.w),
                     ] else if (icon != null) ...[
-                      Padding(
-                        padding: EdgeInsets.all(12.w),
+                      Container(
+                        width: isTablet ? 52.w : 48.w,
+                        alignment: Alignment.center,
                         child: Icon(
                           icon,
                           color: iconColor ?? Colors.white70,
-                          size: isTablet ? 24.sp : 21.sp,
+                          size: isTablet ? 24.sp : 20.sp,
                         ),
                       ),
-                      SizedBox(width: 8.w),
                     ],
                   ],
+                  if (isFilled) ...[
+                    Container(
+                      width: isTablet ? 52.w : 48.w,
+                      alignment: Alignment.center,
+                      child: Text(
+                        getCountryFlag(countryCode),
+                        style: TextStyle(fontSize: isTablet ? 24.sp : 20.sp),
+                      ),
+                    ),
+                  ],
                   Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: isFilled ? 12.w : 0),
-                      child: Row(
-                        children: [
-                          if (isFilled) ...[
-                            Text(
-                              getCountryFlag(countryCode),
-                              style: TextStyle(fontSize: 18.sp),
-                            ),
-                            SizedBox(width: 8.w),
-                          ],
-                          Expanded(
-                            child: Text(
-                              displayText,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: isFilled
-                                    ? Colors.white
-                                    : const Color.fromRGBO(255, 255, 255, 0.52),
-                                fontSize: 18.sp,
-                              ),
-                            ),
-                          ),
-                        ],
+                    child: Text(
+                      displayText,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: isFilled
+                            ? Colors.white
+                            : const Color.fromRGBO(255, 255, 255, 0.52),
+                        fontSize: isTablet ? 20.sp : 18.sp,
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(right: 12.w),
+                  Container(
+                    width: isTablet ? 52.w : 48.w,
+                    alignment: Alignment.center,
                     child: Icon(
-                      Icons.arrow_drop_down,
-                      size: 26.sp,
+                      Icons.keyboard_arrow_down_rounded,
+                      size: isTablet ? 24.sp : 20.sp,
                       color: const Color(0xFF09BDFF),
                     ),
                   ),

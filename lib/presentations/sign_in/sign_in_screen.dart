@@ -571,9 +571,15 @@ class _SignInScreenState extends State<SignInScreen> {
                               ? AppLocalizations.signingIn
                               : AppLocalizations.signInWithGoogle),
                       icon: Platform.isIOS
-                          ? const Icon(Icons.apple)
+                          ? Icon(
+                              Icons.apple,
+                              size: isTablet ? 36 : 28,
+                              color: Colors.black,
+                            )
                           : Image.asset(
                               AppImages.googlePng,
+                              height: isTablet ? 34 : 26,
+                              width: isTablet ? 34 : 26,
                               fit: BoxFit.contain,
                             ),
                       gradient: const LinearGradient(
@@ -597,7 +603,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       text: _isFacebookLoading
                           ? AppLocalizations.signingIn
                           : AppLocalizations.signInWithFacebook,
-                      icon: const Icon(Icons.facebook),
+                      icon: Icon(
+                        Icons.facebook,
+                        size: isTablet ? 36 : 28,
+                      ),
                       gradient: const LinearGradient(
                         colors: [
                           Color(0xFF0866FF),
@@ -704,13 +713,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (!centerText) ...[
-                    SizedBox(
+                    Container(
                       height: iconSize,
                       width: iconSize,
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: icon,
-                      ),
+                      alignment: Alignment.center,
+                      child: icon,
                     ),
                     const SizedBox(width: 16),
                   ],
