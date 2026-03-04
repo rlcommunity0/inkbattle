@@ -55,7 +55,7 @@ class _TabletAvatarSelectionSheetState extends State<TabletAvatarSelectionSheet>
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(horizontal: isTablet ? MediaQuery.of(context).size.width * 0.15 : 20.w),
+      insetPadding: EdgeInsets.symmetric(horizontal: isTablet ? MediaQuery.of(context).size.width * 0.08 : 15.w),
       child: Container(
         width: isTablet ? MediaQuery.of(context).size.width * 0.7 : double.infinity,
         height: isTablet ? MediaQuery.of(context).size.height * 0.7 : MediaQuery.of(context).size.height * 0.6,
@@ -88,7 +88,7 @@ class _TabletAvatarSelectionSheetState extends State<TabletAvatarSelectionSheet>
             padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 12.h),
+              padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
               decoration: BoxDecoration(
                 color: const Color(0xFF1B1B1B), // Dark background
                 borderRadius: BorderRadius.circular(15.r),
@@ -98,7 +98,7 @@ class _TabletAvatarSelectionSheetState extends State<TabletAvatarSelectionSheet>
                 'Choose Avatar for best start',
                 style: GoogleFonts.lato(
                   color: Colors.white,
-                  fontSize: isTablet ? 18.sp : 16.sp,
+                  fontSize: isTablet ? 15.sp : 16.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),

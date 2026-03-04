@@ -128,7 +128,7 @@ class _SignInScreenState extends State<SignInScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.googleSignInFailed)),
+            SnackBar(content: Text(AppLocalizations.appleSignInFailed)),
           );
         }
       }
