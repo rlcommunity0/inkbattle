@@ -307,7 +307,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                                   text: widget.isTeamMode
                                       ? AppLocalizations.createTeamRoom
                                       : AppLocalizations.createRoom,
-                                  fontSize: isTablet ? 25.sp : 24.sp,
+                                  fontSize: isTablet ? 23.sp : 22.sp,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.whiteColor,
                                 ),
@@ -320,50 +320,54 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                         Expanded(
                           child: Center(
                             child: ConstrainedBox(
-                              constraints: BoxConstraints(maxWidth: isTablet ? 500 : double.infinity),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Info text
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                                    child: TextWidget(
-                                      text: AppLocalizations.createRoomConfigureLobby,
-                                      fontSize: isTablet ? 18.sp : 16.sp,
-                                      color: Colors.white70,
-                                      textAlign: TextAlign.center,
+                              constraints: BoxConstraints(maxWidth: isTablet ? 600 : double.infinity),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: isTablet ? 20.w : 10.w), // Added reduced padding just for middle content
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    // Info text
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                                      child: TextWidget(
+                                        text: AppLocalizations.createRoomConfigureLobby,
+                                        fontSize: isTablet ? 16.sp : 14.sp,
+                                        color: Colors.white70,
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 40.h),
-                
-                                  // Room Name Input
-                                  TextformFieldWidget(
-                                    controller: _roomNameController,
-                                    height: isTablet ? 60.h : 55.h,
-                                    rouneded: 30.r,
-                                    fontSize: isTablet ? 18.sp : 16.sp,
-                                    hintText: AppLocalizations.enterRoomNameHint,
-                                    hintTextColor: const Color.fromRGBO(255, 255, 255, 0.52),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 15.h), // Better padding
-                                  ),
-                                  SizedBox(height: 40.h),
-                
-                                  // Create button
-                                  _buildCreateButton(isTablet),
-                
-                                  SizedBox(height: 30.h),
-                
-                                  // Additional info
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                                    child: TextWidget(
-                                      text: AppLocalizations.roomCodeShareInfo,
-                                      fontSize: isTablet ? 14.sp : 12.sp,
-                                      color: Colors.grey,
-                                      textAlign: TextAlign.center,
+                                    SizedBox(height: 40.h),
+                  
+                                    // Room Name Input
+                                    TextformFieldWidget(
+                                      controller: _roomNameController,
+                                      height: isTablet ? 55.h : 50.h,
+                                      rouneded: 30.r,
+                                      fontSize: isTablet ? 16.sp : 14.sp,
+                                      hintText: AppLocalizations.enterRoomNameHint,
+                                      hintTextColor: const Color.fromRGBO(255, 255, 255, 0.52),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 15.h), // Better padding
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(height: 40.h),
+                  
+                                    // Create button
+                                    _buildCreateButton(isTablet),
+                  
+                                    SizedBox(height: 30.h),
+                  
+                                    // Additional info
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                                      child: TextWidget(
+                                        text: AppLocalizations.roomCodeShareInfo,
+                                        fontSize: isTablet ? 12.sp : 10.sp,
+                                        color: Colors.grey,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -388,7 +392,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
   Widget _buildCreateButton(bool isTablet) {
     return Container(
       width: double.infinity,
-      height: isTablet ? 60.h : 55.h,
+      height: isTablet ? 55.h : 50.h,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -418,7 +422,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             ? const CircularProgressIndicator(color: Colors.white)
             : TextWidget(
                 text: AppLocalizations.createRoom,
-                fontSize: isTablet ? 20.sp : 18.sp,
+                fontSize: isTablet ? 18.sp : 16.sp,
                 fontWeight: FontWeight.bold,
                 color: AppColors.whiteColor,
               ),

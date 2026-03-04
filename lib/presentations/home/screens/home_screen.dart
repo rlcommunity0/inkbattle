@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     required double size,
   }) {
     // Slightly larger circle so coinsss image appears a bit bigger (Figma)
-    final buttonSize = isTablet ? size * 0.36 : size * 0.34;
+    final buttonSize = isTablet ? size * 0.40 : size * 0.36;
     return Material(
       color: Colors.transparent,
       shape: const CircleBorder(),
@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: const AssetImage(AppImages.coinsss),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
@@ -239,8 +239,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               // Red notification at top-right, slightly overlapping (Figma)
               if (showNotification)
                 Positioned(
-                  top: -4,
-                  right: -4,
+                  top: isTablet ? -10 : -6,
+                  right: isTablet ? -10 : -6,
                   child: Container(
                     width: isTablet ? 14.r : 10.r,
                     height: isTablet ? 14.r : 10.r,
@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   /// Same font and style as Play Random / Multiplayer / Friends (CustomRoomButton).
   Widget _buildCircleButtonText(String text, bool isTablet) {
-    final double textSize = isTablet ? 14.sp : 14.sp;
+    final double textSize = isTablet ? 12.sp : 13.sp;
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -461,8 +461,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             },
                                             child: Padding(
                                               padding: EdgeInsets.symmetric(
-                                                horizontal: 6.w,
-                                                vertical: 4.h,
+                                                horizontal: 4.w,
+                                                vertical: 3.h,
                                               ),
                                               child: FittedBox(
                                                 fit: BoxFit.scaleDown,

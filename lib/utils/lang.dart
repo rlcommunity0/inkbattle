@@ -186,6 +186,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'Username is required for signup.',
       'google_sign_in_failed': 'Google sign-in failed. Please try again.',
+      'apple_sign_in_failed': 'Apple sign-in failed. Please try again.',
       'facebook_sign_in_failed': 'Facebook sign-in failed. Please try again.',
       'sign_in_error': 'Error',
       'word_theme': 'Word Theme',
@@ -556,6 +557,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'साइनअप के लिए उपयोगकर्ता नाम आवश्यक है।',
       'google_sign_in_failed': 'Google साइन-इन विफल। कृपया पुनः प्रयास करें।',
+      'apple_sign_in_failed': 'Apple साइन-इन विफल। कृपया पुनः प्रयास करें।',
       'facebook_sign_in_failed': 'Facebook साइन-इन विफल। कृपया पुनः प्रयास करें।',
       'sign_in_error': 'त्रुटि',
       'word_theme': 'शब्द थीम',
@@ -916,6 +918,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'సైన్ అప్ కోసం యూజర్ పేరు అవసరం.',
       'google_sign_in_failed': 'Google సైన్ ఇన్ విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
+      'apple_sign_in_failed': 'Apple సైన్ ఇన్ విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
       'facebook_sign_in_failed': 'Facebook సైన్ ఇన్ విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
       'sign_in_error': 'లోపం',
       'word_theme': 'పద థీమ్',
@@ -1277,6 +1280,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'பதிவுக்கு பயனர் பெயர் தேவை.',
       'google_sign_in_failed': 'Google உள்நுழைவு தோல்வி. மீண்டும் முயற்சிக்கவும்.',
+      'apple_sign_in_failed': 'Apple உள்நுழைவு தோல்வி. மீண்டும் முயற்சிக்கவும்.',
       'facebook_sign_in_failed': 'Facebook உள்நுழைவு தோல்வி. மீண்டும் முயற்சிக்கவும்.',
       'sign_in_error': 'பிழை',
       'word_theme': 'சொல் தீம்',
@@ -1636,6 +1640,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'साइनअपसाठी वापरकर्तानाव आवश्यक आहे.',
       'google_sign_in_failed': 'Google साइन इन अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+      'apple_sign_in_failed': 'Apple साइन इन अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
       'facebook_sign_in_failed': 'Facebook साइन इन अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
       'sign_in_error': 'त्रुटी',
       'word_theme': 'शब्द थीम',
@@ -1996,6 +2001,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'ಸೈನ್ ಅಪ್‌ಗಾಗಿ ಬಳಕೆದಾರ ಹೆಸರು ಅಗತ್ಯ.',
       'google_sign_in_failed': 'Google ಸೈನ್ ಇನ್ ವಿಫಲವಾಯಿತು. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+      'apple_sign_in_failed': 'Apple ಸೈನ್ ಇನ್ ವಿಫಲವಾಯಿತು. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
       'facebook_sign_in_failed': 'Facebook ಸೈನ್ ಇನ್ ವಿಫಲವಾಯಿತು. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
       'sign_in_error': 'ದೋಷ',
       'word_theme': 'ಪದ ಥೀಮ್',
@@ -2360,6 +2366,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'സൈൻ അപ്പിന് ഉപയോക്തൃനാമം ആവശ്യമാണ്.',
       'google_sign_in_failed': 'Google സൈൻ ഇൻ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
+      'apple_sign_in_failed': 'Apple സൈൻ ഇൻ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
       'facebook_sign_in_failed': 'Facebook സൈൻ ഇൻ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ശ്രമിക്കുക.',
       'sign_in_error': 'പിശക്',
       'word_theme': 'വേഡ് തീം',
@@ -2719,6 +2726,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'সাইন আপের জন্য ব্যবহারকারীর নাম প্রয়োজন।',
       'google_sign_in_failed': 'গুগল সাইন ইন ব্যর্থ। আবার চেষ্টা করুন।',
+      'apple_sign_in_failed': 'Apple সাইন ইন ব্যর্থ। আবার চেষ্টা করুন।',
       'facebook_sign_in_failed': 'ফেসবুক সাইন ইন ব্যর্থ। আবার চেষ্টা করুন।',
       'sign_in_error': 'ত্রুটি',
       'word_theme': 'শব্দ থিম',
@@ -3078,6 +3086,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'اسم المستخدم مطلوب للتسجيل.',
       'google_sign_in_failed': 'فشل تسجيل الدخول بجوجل. يرجى المحاولة مرة أخرى.',
+      'apple_sign_in_failed': 'فشل تسجيل الدخول بابل. يرجى المحاولة مرة أخرى.',
       'facebook_sign_in_failed': 'فشل تسجيل الدخول بفيسبوك. يرجى المحاولة مرة أخرى.',
       'sign_in_error': 'خطأ',
       'word_theme': 'ثيم الكلمة',
@@ -3437,6 +3446,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'El nombre de usuario es obligatorio para registrarse.',
       'google_sign_in_failed': 'Error al iniciar sesión con Google. Inténtalo de nuevo.',
+      'apple_sign_in_failed': 'Error al iniciar sesión con Apple. Inténtalo de nuevo.',
       'facebook_sign_in_failed': 'Error al iniciar sesión con Facebook. Inténtalo de nuevo.',
       'sign_in_error': 'Error',
       'word_theme': 'Tema de palabra',
@@ -3796,6 +3806,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'Nome de usuário é obrigatório para se cadastrar.',
       'google_sign_in_failed': 'Falha no login com Google. Tente novamente.',
+      'apple_sign_in_failed': 'Falha no login com Apple. Tente novamente.',
       'facebook_sign_in_failed': 'Falha no login com Facebook. Tente novamente.',
       'sign_in_error': 'Erro',
       'word_theme': 'Tema da palavra',
@@ -4156,6 +4167,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'Le nom d\'utilisateur est requis pour l\'inscription.',
       'google_sign_in_failed': 'Échec de la connexion Google. Veuillez réessayer.',
+      'apple_sign_in_failed': 'Échec de la connexion Apple. Veuillez réessayer.',
       'facebook_sign_in_failed': 'Échec de la connexion Facebook. Veuillez réessayer.',
       'sign_in_error': 'Erreur',
       'word_theme': 'Thème du mot',
@@ -4516,6 +4528,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'Benutzername ist für die Anmeldung erforderlich.',
       'google_sign_in_failed': 'Google-Anmeldung fehlgeschlagen. Bitte erneut versuchen.',
+      'apple_sign_in_failed': 'Apple-Anmeldung fehlgeschlagen. Bitte erneut versuchen.',
       'facebook_sign_in_failed': 'Facebook-Anmeldung fehlgeschlagen. Bitte erneut versuchen.',
       'sign_in_error': 'Fehler',
       'word_theme': 'Wort-Thema',
@@ -4875,6 +4888,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'Имя пользователя обязательно для входа.',
       'google_sign_in_failed': 'Ошибка входа через Google. Попробуйте снова.',
+      'apple_sign_in_failed': 'Ошибка входа через Apple. Попробуйте снова.',
       'facebook_sign_in_failed': 'Ошибка входа через Facebook. Попробуйте снова.',
       'sign_in_error': 'Ошибка',
       'word_theme': 'Тема слова',
@@ -5234,6 +5248,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'ログインにはユーザー名が必要です。',
       'google_sign_in_failed': 'Googleログインに失敗しました。もう一度お試しください。',
+      'apple_sign_in_failed': 'Appleログインに失敗しました。もう一度お試しください。',
       'facebook_sign_in_failed': 'Facebookログインに失敗しました。もう一度お試しください。',
       'sign_in_error': 'エラー',
       'word_theme': 'お題',
@@ -5593,6 +5608,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'ਲੌਗਇਨ ਕਰਨ ਲਈ ਯੂਜ਼ਰਨੇਮ ਲੋੜੀਂਦਾ ਹੈ।',
       'google_sign_in_failed': 'ਗੂਗਲ ਸਾਈਨ ਇਨ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+      'apple_sign_in_failed': 'ਐਪਲ ਸਾਈਨ ਇਨ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
       'facebook_sign_in_failed': 'ਫੇਸਬੁੱਕ ਸਾਈਨ ਇਨ ਅਸਫਲ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
       'sign_in_error': 'ਗਲਤੀ',
       'word_theme': 'ਸ਼ਬਦ ਥੀਮ',
@@ -5952,6 +5968,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'લોગઇન માટે વપરાશકર્તા નામ જરૂરી છે.',
       'google_sign_in_failed': 'ગુગલ સાઇન ઇન નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.',
+      'apple_sign_in_failed': 'એપલ સાઇન ઇન નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.',
       'facebook_sign_in_failed': 'ફેસબુક સાઇન ઇન નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.',
       'sign_in_error': 'ભૂલ',
       'word_theme': 'શબ્દ થીમ',
@@ -6314,6 +6331,7 @@ class AppLocalizations {
       // New keys
       'username_required': 'Il nome utente è obbligatorio per accedere.',
       'google_sign_in_failed': 'Accesso con Google fallito. Riprova.',
+      'apple_sign_in_failed': 'Accesso con Apple fallito. Riprova.',
       'facebook_sign_in_failed': 'Accesso con Facebook fallito. Riprova.',
       'sign_in_error': 'Errore',
       'word_theme': 'Tema parola',
@@ -6678,6 +6696,7 @@ class AppLocalizations {
       // New keys
       'username_required': '로그인하려면 사용자 이름이 필요합니다.',
       'google_sign_in_failed': 'Google 로그인 실패. 다시 시도하세요.',
+      'apple_sign_in_failed': 'Apple 로그인 실패. 다시 시도하세요.',
       'facebook_sign_in_failed': 'Facebook 로그인 실패. 다시 시도하세요.',
       'sign_in_error': '오류',
       'word_theme': '단어 테마',
@@ -7042,6 +7061,7 @@ class AppLocalizations {
       // New keys
       'username_required': '登录需要用户名。',
       'google_sign_in_failed': 'Google 登录失败，请重试。',
+      'apple_sign_in_failed': 'Apple 登录失败，请重试。',
       'facebook_sign_in_failed': 'Facebook 登录失败，请重试。',
       'sign_in_error': '错误',
       'word_theme': '词语主题',
@@ -7456,6 +7476,7 @@ class AppLocalizations {
 
   static String get usernameRequired => translate('username_required');
   static String get googleSignInFailed => translate('google_sign_in_failed');
+  static String get appleSignInFailed => translate('apple_sign_in_failed');
   static String get facebookSignInFailed =>
       translate('facebook_sign_in_failed');
   static String get signInError => translate('sign_in_error');
