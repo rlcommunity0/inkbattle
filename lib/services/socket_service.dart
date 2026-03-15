@@ -474,6 +474,13 @@ class SocketService {
     _socket?.emit('choose_word', {'roomId': roomId, 'word': word});
   }
 
+  /// Removes all game listeners then runs [register]. Ensures remove and register
+  /// run sequentially and never in parallel with another replaceGameListeners call.
+  void replaceGameListeners(void Function() register) {
+    removeAllListeners();
+    register();
+  }
+
   // Remove listeners (e.g. when leaving game screen). Also clear reconnect callback so we don't hold widget reference.
   void removeAllListeners() {
     _onReconnect = null;

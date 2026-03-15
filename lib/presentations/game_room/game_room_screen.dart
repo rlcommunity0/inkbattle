@@ -226,7 +226,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   UserModel? _currentUser;
 
   bool _isResuming = false;
-     bool _isReconnecting = false;
+  bool _isReconnecting = false;
+  // bool _listenerRegistered = false;
 
   final ValueNotifier<List<fdb.Stroke>> _strokes = ValueNotifier([]);
   final fdb.CurrentStrokeValueNotifier _currentStroke =
@@ -276,13 +277,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
   /// Frontend role guard: true only when current user is the room's drawer (myId == drawerId).
   /// Use this for drawer-only UI so guesser never sees color box / tools even if backend glitches.
-  bool get _amIDrawer {
-    if (_currentUser?.id == null) return false;
-    final myId = _currentUser!.id;
-    final drawerId = _room?.currentDrawerId ?? _currentDrawerInfo?['id'];
-    if (drawerId == null) return false;
-    return myId == drawerId || myId.toString() == drawerId.toString();
-  }
+  // bool get _amIDrawer {
+  //   if (_currentUser?.id == null) return false;
+  //   final myId = _currentUser!.id;
+  //   final drawerId = _room?.currentDrawerId ?? _currentDrawerInfo?['id'];
+  //   if (drawerId == null) return false;
+  //   return myId == drawerId || myId.toString() == drawerId.toString();
+  // }
+
   int? _lastRoundGuessedCount;
   int? _lastRoundTotalGuessers;
   String? _currentWord;
@@ -321,7 +323,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   bool _isLeaderboardVisible = false;
   bool _showPencilTools = false;
   bool _isGameEnded = false;
-  bool _isPostGameTransition = false; // Loading overlay from game end → coins → leaderboard → ad → lobby
+  bool _isPostGameTransition = false; // Loading overlay from game end -> coins -> leaderboard -> ad -> lobby
   bool _shouldExitAfterAd = false;
   bool _isShowingAd = false;
   bool _isWaitingForHostOrMembers = false; // Track if we're waiting for host/members after returning to lobby
@@ -916,8 +918,10 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 drawerId.toString() == _currentUser!.id.toString());
         // When not drawer, clear drawer-only state so guesser doesn't see colors/options
         if (!_isDrawer) {
-          _wordOptions = null;
-          _isWordSelectionDialogVisible = false;
+          if (room.status == 'playing' && room.roundPhase != 'choosing_word') {
+            _wordOptions = null;
+            _isWordSelectionDialogVisible = false;
+          }
           _currentDrawerInfo = null;
         }
         // Session-scoped canvas invalidation: keep strokes only if still drawer AND same round
@@ -1098,10 +1102,10 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         },
         (room) {
           // #region agent log
-          _debugLobbyLog('game_room_screen:_initializeRoom', 'room loaded', {
-            'roomStatus': room.status,
-            'waitingForPlayersComputed': room.status == 'lobby' || room.status == 'waiting',
-          }, 'H5');
+          // _debugLobbyLog('game_room_screen:_initializeRoom', 'room loaded', {
+          //   'roomStatus': room.status,
+          //   'waitingForPlayersComputed': room.status == 'lobby' || room.status == 'waiting',
+          // }, 'H5');
           // #endregion
           setState(() {
             _room = room;
@@ -1180,7 +1184,12 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
         _selectTeam(selectedTeam!);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      NativeLogService.log(
+        '_initializeRoom() failed for roomId=${widget.roomId}: $e\n$stackTrace',
+        tag: _logTag,
+        level: 'debug',
+      );
       if (mounted) {
         // ScaffoldMessenger.of(context).showSnackBar(
         //   SnackBar(content: Text('Error: $e')),
@@ -1369,7 +1378,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
       if (ok) {
         // Successful handshake: start watchdog so room_joined must arrive within timeout.
-        _joinRetryCount = 0;
+        // _joinRetryCount = 0;
         _joinWatchdogTimer?.cancel();
         _joinWatchdogTimer = Timer(const Duration(seconds: 10), () {
           if (!mounted) return;
@@ -1419,7 +1428,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
   void _scheduleJoinRetry({required String error}) {
     if (!mounted) return;
-    // Cap total retry attempts/time: exponential backoff 0.5s → 1s → 2s → 4s (cap at 4s)
+    // Cap total retry attempts/time: exponential backoff 0.5s -> 1s -> 2s -> 4s (cap at 4s)
     if (_joinRetryCount >= 5) {
       NativeLogService.log(
         'Join retry limit reached for roomId=${widget.roomId}, lastError=$error',
@@ -1501,9 +1510,15 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
     final didCreateSocket = _socketService.connect(token);
     // Register listeners only when a new socket was created (avoids duplicate listeners).
-    if (didCreateSocket) {
-      _registerSocketListeners();
-    }
+    // if (didCreateSocket) {
+    // NativeLogService.log('_listenerRegistered: ${_listenerRegistered}', tag: _logTag, level: 'debug');
+    // if (!_listenerRegistered) {
+    //   _registerSocketListeners();
+    //   _listenerRegistered = true;
+    // }
+    _socketService.replaceGameListeners(_registerSocketListeners);
+
+    // }
     // Wait for the underlying Socket.IO client to be fully connected before emitting join_room.
     // This avoids synthetic 'not_connected' ack errors from joinRoomWithAck on first load and
     // ensures listeners are attached before any room_joined events arrive.
@@ -1525,7 +1540,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     _socketService.setOnDisconnect(() {
       if (mounted) setState(() => _connectionState = GameConnectionState.syncing);
     });
-    // Set reconnect callback whenever we're on game screen (same socket reconnects → re-join; room_joined carries phase).
+    // Set reconnect callback whenever we're on game screen (same socket reconnects -> re-join; room_joined carries phase).
     _socketService.setOnReconnect(() {
       if (!mounted) return;
       setState(() => _connectionState = GameConnectionState.syncing);
@@ -1588,6 +1603,11 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             _waitingForPlayers = roomStatus == 'waiting' || roomStatus == 'lobby';
             if (_room != null) _room!.status = roomStatus;
             if (roomStatus == 'lobby' || roomStatus == 'waiting') {
+              // In lobby/waiting there is no active drawer. Clear any stale drawer state
+              // so guessers never see drawer UI after game end or when re-entering room.
+              _isDrawer = false;
+              _currentDrawerInfo = null;
+              _currentWord = null;
               _isGameEnded = false;
               _isPostGameTransition = false;
               _isWaitingForHostOrMembers = true;
@@ -2381,6 +2401,11 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     });
 
     _socketService.onPhaseChange((data) {
+      NativeLogService.log(
+        'onPhaseChange EVENT RECEIVED -> data: $data',
+        tag: _logTag,
+        level: 'debug',
+      );
       if (mounted) {
         final String? nextPhase = data['phase'] as String?;
         if (nextPhase == null || nextPhase.isEmpty) return;
@@ -2410,6 +2435,18 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         } else {
           initialRemaining = duration;
         }
+        NativeLogService.log(
+          'Parsed phase params -> '
+          'nextPhase=$nextPhase '
+          'duration=$duration '
+          'phaseEndTimeMs=$phaseEndTimeMs '
+          'phaseMax=$phaseMax '
+          'initialRemaining=$initialRemaining '
+          'lastPhase=$lastPhase '
+          'lastPhaseRemaining=$lastPhaseTimeRemaining',
+          tag: _logTag,
+          level: 'debug',
+        );
         setState(() {
           _currentPhase = nextPhase;
           _phaseTimeRemaining = initialRemaining;
@@ -2420,9 +2457,35 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           if (data['drawer'] is Map<String, dynamic>) {
             _currentDrawerInfo = Map<String, dynamic>.from(
                 data['drawer'] as Map<String, dynamic>);
+            // Recompute drawer role from server state (source of truth) so guessers
+            // never see drawer-only UI when drawer changes mid-game.
+            final drawerId = _currentDrawerInfo?['id'];
+            if (drawerId != null && _currentUser?.id != null) {
+              _isDrawer = drawerId.toString() == _currentUser!.id.toString();
+            } else if (nextPhase != 'drawing' && nextPhase != 'choosing_word') {
+              // Outside drawing/choosing_word there is no active drawer.
+              _isDrawer = false;
+            }
+          } else if (nextPhase != 'drawing' && nextPhase != 'choosing_word') {
+            // Phase changed and server did not send a drawer object; treat as no active drawer.
+            _currentDrawerInfo = null;
+            _isDrawer = false;
           }
-
+          NativeLogService.log(
+            'Drawer info received -> ${data['drawer']}',
+            tag: _logTag,
+            level: 'debug',
+          );
           if (nextPhase == 'drawing') {
+            NativeLogService.log(
+              'DRAWING phase setup -> '
+              'isDrawer=$_isDrawer '
+              'word=$_currentWord '
+              'hint=$_wordHint '
+              'boardSize=$_drawerBoardSize',
+              tag: _logTag,
+              level: 'debug',
+            );
             _isIntervalPhase = false;
             _wordHint = data['wordHint'];
             if (_isDrawer) {
@@ -2433,6 +2496,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             }
             _hintsRemaining = 3;
             _revealedWord = null;
+            _wordOptions = null;
             _showWordHint = false;
             // _chatMessages.clear();
             _currentDrawerMessageKey = null;
@@ -2455,6 +2519,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             _isIntervalPhase = false;
             _currentWord = data['word'];
             _currentWordForDashes = null;
+            _wordOptions = null;
             _showWordHint = false;
             // Sync participant scores from server (drawer + guessers) so UI shows correct scores
             final participantsList = data['participants'] as List?;
@@ -2478,8 +2543,16 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             }
             // Drawer bonus only in 1v1; team vs team has no drawer bonus
             final drawerReward = data['drawerReward'] ?? 0;
+            // Determine reveal drawer from backend payload so we don't depend on _isDrawer,
+            // which is cleared outside drawing/choosing_word phases.
+            final dynamic rawDrawerId = data['drawerId'] ?? _room?.currentDrawerId;
+            final bool isRevealDrawer = _currentUser?.id != null &&
+                rawDrawerId != null &&
+                (rawDrawerId == _currentUser!.id ||
+                    rawDrawerId.toString() == _currentUser!.id.toString());
+
             if (selectedGameMode != 'team_vs_team' &&
-                _isDrawer &&
+                isRevealDrawer &&
                 drawerReward != null &&
                 drawerReward > 0) {
               _earnedPointsDisplay = drawerReward;
@@ -2487,7 +2560,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               _socketService.socket?.emit('drawer_earned_points', {'roomId': widget.roomId});
             }
             // Show compliments for drawer. When drawer earned points, show compliments soon so they appear while points animate (~2s).
-            if (_isDrawer) {
+            if (isRevealDrawer) {
               final isTimeUp = _phaseTimeRemaining <= 2;
               final drawerEarnedPoints = (selectedGameMode != 'team_vs_team' &&
                   drawerReward != null && drawerReward > 0);
@@ -2516,6 +2589,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             isAnsweredCorrectly = false;
             _isIntervalPhase = true;
             setState(() {});
+            _wordOptions = null;
             _currentWord = null;
             _wordHint = null;
             _currentWordForDashes = null;
@@ -2534,6 +2608,11 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             _drawerBoardSize = savedSize;
             _lastKnownBoardSize = savedSize;
           } else if (nextPhase == 'choosing_word') {
+            NativeLogService.log(
+              'CHOOSING_WORD phase -> waiting for drawer',
+              tag: _logTag,
+              level: 'debug',
+            );
             _isIntervalPhase = false;
             _currentWord = null;
             _strokes.value = [];
@@ -2546,6 +2625,11 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             _whosNextVideoController?.pause();
           }
         });
+        NativeLogService.log(
+          'PHASE TRANSITION -> $lastPhase -> $nextPhase',
+          tag: _logTag,
+          level: 'debug',
+        );
         // Start local phase countdown from phaseEndTime (server no longer sends time_update every second)
         if (phaseEndTimeMs != null && (phaseEndTimeMs is int || phaseEndTimeMs is num) && mounted) {
           final endMs = (phaseEndTimeMs as num).toInt();
@@ -2565,11 +2649,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           _startProgressSmoothTimer(endMs);
         }
         _showDrawerInfo = false;
-        NativeLogService.log(
-            'Phase changed to $nextPhase. Board size preserved: $_drawerBoardSize',
-            tag: _logTag,
-            level: 'debug'
-          );
+        NativeLogService.log('Phase changed to $nextPhase. Board size preserved: $_drawerBoardSize, _isDrawer: $_isDrawer ', tag: _logTag, level: 'debug');
         if (nextPhase != 'choosing_word') {
           _cancelWordSelectionCountdown();
         }
@@ -2663,9 +2743,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       }
     });
     _socketService.onWordOptions((data) {
+      NativeLogService.log(
+        'WORD_OPTIONS EVENT RECEIVED -> data: $data',
+        tag: _logTag,
+        level: 'debug',
+      );
       if (!mounted) return;
       // Show word selection when we receive word_options (server sends only to drawer's current socket).
-      // Do not require _amIDrawer here so drawer gets dialog even when word_options arrive before phase_change.
+      // Do not require _isDrawer here so drawer gets dialog even when word_options arrive before phase_change.
       final List<String> options =
           List<String>.from(data['words'] ?? const <String>[]);
       if (options.isEmpty) return;
@@ -2673,7 +2758,9 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           ? data['duration'] as int
           : 10;
       setState(() {
-        _isDrawer = true;
+        // Server only sends word_options to the current drawer's socket.
+        // Do NOT flip _isDrawer here for everyone; rely on server-derived role.
+        _currentPhase = 'choosing_word';
         _wordOptions = options;
       });
       _startWordSelectionCountdown(duration);
@@ -3639,7 +3726,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   }
 
   Widget _showWordSelectionDialog() {
-    if (!_amIDrawer) return const SizedBox.shrink();
+    NativeLogService.log('_isDrawer: $_isDrawer, _wordOptions: $_wordOptions', tag: _logTag, level: 'debug');
+    if (!_isDrawer) return const SizedBox.shrink();
     if (_wordOptions == null || _wordOptions!.isEmpty) return const SizedBox.shrink();
     return Container(
       width: double.infinity,
@@ -3702,7 +3790,9 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
           setState(() {
             _currentWord = _wordOptions?[index];
-            _wordOptions = null;
+            if (_currentPhase != 'choosing_word') {
+              _wordOptions = null;
+            }
           });
         },
         child: Text(
@@ -3730,10 +3820,17 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     final coinsWon = currentUserRanking?['coinsAwarded'] ?? 0;
     final isTeamMode = selectedGameMode == 'team_vs_team';
     // Top 3 in 1v1, or on winning team (coinsAwarded > 0) in team mode
+    // final isWinner = currentUserRanking != null &&
+    //     (isTeamMode
+    //         ? (coinsWon as int? ?? 0) > 0
+    //         : ((currentUserRanking['place'] as int? ?? 999) <= 3));
+    // final int participantCount = rankings.length;
+    // Top 3 in 1v1 (but no "victory" when only 2 players); team mode: on winning team
     final isWinner = currentUserRanking != null &&
-        (isTeamMode
-            ? (coinsWon as int? ?? 0) > 0
-            : ((currentUserRanking['place'] as int? ?? 999) <= 3));
+        // (isTeamMode
+        //     ? (coinsWon as int? ?? 0) > 0
+        //     : (participantCount > 2 && (currentUserRanking['place'] as int? ?? 999) <= 3));
+        (coinsWon as int? ?? 0) > 0;
 
     void proceedToCoinsAndLeaderboard() {
       if (!mounted) return;
@@ -3762,7 +3859,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   void _showCoinsThenLeaderboard(List rankings, int coinsWon, bool isTeamMode, bool isWinner) {
     if (!mounted) return;
     if (coinsWon > 0) {
-      // Flow: coins animation first, then leaderboard podium; Next on podium → ad → lobby
+      // Flow: coins animation first, then leaderboard podium; Next on podium -> ad -> lobby
       CoinAnimationDialog.show(
         context,
         coinsAwarded: coinsWon,
@@ -4614,6 +4711,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     _markLeftCurrentRoom();
     _socketService.leaveRoom(widget.roomId);
     _socketService.removeAllListeners();
+    // _listenerRegistered = false;
+    NativeLogService.log('dispose', tag: _logTag, level: 'debug');
     _joinWatchdogTimer?.cancel();
     // _voiceService.cleanUp();
     _closeRewardedAd?.dispose();
@@ -4800,13 +4899,22 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   }
 
   Widget _buildGameScreen() {
+    // While resuming or not yet ready, show a full-screen loading view
+    if (_isResuming || _connectionState != GameConnectionState.ready) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(), // or your custom loader
+        ),
+      );
+    }
+
     final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     // If drawer, show fullscreen drawing board (role guard: only when myId == drawerId and we've been marked drawer e.g. by word_options).
     // Hide during resume so guesser never sees drawer UI from stale state; drawer gets it back after _isResuming clears.
-    if (_amIDrawer &&
-        _isDrawer &&
-        !_isResuming &&
+    if (_isDrawer &&
+       /* !_isResuming && */
         !_waitingForPlayers &&
         _room?.status == 'playing' &&
         _currentWord != null) {
@@ -4913,6 +5021,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     final String expandedKeyString =
         'expanded_${_currentPhase ?? 'unknown'}_${_isDrawer ? 'drawer' : 'guesser'}';
     
+    NativeLogService.log('buildExpandedDrawingScreen, _isDrawer: $_isDrawer, _isResuming: $_isResuming, _currentWord: $_currentWord, _currentPhase: $_currentPhase', tag: _logTag, level: 'debug');
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -5165,13 +5275,13 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 !_shouldShowNextDrawerOverlay )
               _buildLeaderboardOverlay(),
 
-            if (_amIDrawer && _isDrawer && !_isResuming) ...[
+            if (_isDrawer && !_isResuming) ...[
               _buildOptionIcon(),
               _buildDrawingTools(),
             ],
 
             // Show chosen word for drawer at bottom left (role guard: only when myId == drawerId)
-            if (_amIDrawer && !_isResuming && _currentWord != null && _currentPhase == 'drawing')
+            if (_isDrawer && !_isResuming && _currentWord != null && _currentPhase == 'drawing')
               Positioned(
                 bottom: 80.h,
                 left: 16.w,
@@ -9344,7 +9454,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   }
 
   void _showThicknessOpacityPopup(TapDownDetails details) async {
-    if (!_amIDrawer) return;
+    if (!_isDrawer) return;
 
     final Offset position = details.globalPosition;
     const Color containerBackground =
@@ -11578,7 +11688,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   // Inside _GameRoomScreenState...
 
   void _showPencilToolsPopup(TapDownDetails details) async {
-    if (!_amIDrawer) return;
+    if (!_isDrawer) return;
 
     final Offset position = details.globalPosition;
 
@@ -12190,6 +12300,11 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   }
 
   Widget _buildBoardArea(double height) {
+    NativeLogService.log(
+      "_buildBoardArea",
+      tag: _logTag,
+      level: 'debug',
+    );
     final players = _participants;
 
     final bool isDrawingPhase = !_waitingForPlayers &&
@@ -12238,7 +12353,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
     NativeLogService.log(
       'boardAreaTiming [H1/run1] phase: $_currentPhase, phaseMaxTime: $_phaseMaxTime, phaseTimeRemaining: $_phaseTimeRemaining, remainingSeconds: $remainingSeconds, progress: $progress, indicatorColor: ${indicatorColor.value}, isDrawingPhase: $isDrawingPhase',
-      tag: 'game_room_screen.dart:_buildBoardArea',
+      tag: _logTag,
       level: 'debug',
     );
 
@@ -12325,7 +12440,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                       ),
                     ),
                   ),
-                if (_amIDrawer &&
+                if (_isDrawer &&
                     !_waitingForPlayers &&
                     _room?.status == 'playing')
                   Positioned(
@@ -12342,7 +12457,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     right: 0,
                     child: Center(child: _buildHintSystem()),
                   ),
-                if (_amIDrawer &&
+                if (_isDrawer &&
                     !_waitingForPlayers &&
                     _room?.status == 'playing' &&
                     _currentPhase == 'drawing')
@@ -12459,7 +12574,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     final bool isDrawingPhase = !_waitingForPlayers &&
         _room?.status == 'playing' &&
         _currentPhase == 'drawing';
-    final bool isFullScreenDrawer = _amIDrawer && isDrawingPhase;
+    final bool isFullScreenDrawer = _isDrawer && isDrawingPhase;
     final bool isActive = _hintsRemaining > 0 &&
         _currentWord != null &&
         _currentPhase == 'drawing';
@@ -12575,7 +12690,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: _amIDrawer ? Colors.white : Colors.grey,
+                        color: _isDrawer ? Colors.white : Colors.grey,
                         width: 2,
                       ),
                       borderRadius: const BorderRadius.all(Radius.circular(3)),
@@ -12594,7 +12709,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: _amIDrawer ? Colors.white : Colors.grey,
+                          color: _isDrawer ? Colors.white : Colors.grey,
                           width: 2),
                       borderRadius: const BorderRadius.all(Radius.circular(3)),
                     ),
@@ -12657,7 +12772,9 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                           Navigator.pop(context);
                                           setState(() {
                                             _currentWord = null;
-                                            _isDrawer = !_isDrawer;
+                                            // Current drawer is skipping; next drawer will be selected by server.
+                                            // Mark ourselves as not drawer locally; role will be re-synced from server events.
+                                            _isDrawer = false;
                                           });
                                           _socketService
                                               .skipTurn(widget.roomId);
@@ -12727,7 +12844,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: _amIDrawer ? Colors.white : Colors.grey,
+                          color: _isDrawer ? Colors.white : Colors.grey,
                           width: 2),
                       borderRadius: const BorderRadius.all(Radius.circular(3)),
                     ),
@@ -12748,7 +12865,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                       margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: _amIDrawer ? Colors.white : Colors.grey,
+                            color: _isDrawer ? Colors.white : Colors.grey,
                             width: 2),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(3)),
@@ -12770,7 +12887,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: _amIDrawer ? Colors.white : Colors.grey,
+                          color: _isDrawer ? Colors.white : Colors.grey,
                           width: 2),
                       borderRadius: const BorderRadius.all(Radius.circular(3)),
                     ),
@@ -13382,7 +13499,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         _findDrawerMessageOption(_currentDrawerMessageKey);
 
     final bool canSelectMessage =
-        _amIDrawer && !_waitingForPlayers && (_room?.status == 'playing');
+        _isDrawer && !_waitingForPlayers && (_room?.status == 'playing');
 
     final Color borderColor =
         selectedOption?.accentColor.withOpacity(0.6) ?? const Color(0xFF0B0B0B);
