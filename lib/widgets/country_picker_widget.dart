@@ -265,7 +265,7 @@ class CountryPickerWidget extends StatelessWidget {
             color: Colors.white, // Always white to match others
             width: isTablet ? 2.0 : 1.w, // Match the 2.0 tablet width from MultiplayerScreen
           ),
-          color: Colors.black.withOpacity(0.35),
+          color: isFilled ? Colors.black.withOpacity(0.35) : Colors.transparent,
         ),
         child: Material(
           color: Colors.transparent,
