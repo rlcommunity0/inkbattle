@@ -682,7 +682,7 @@ class _GameScreenState extends State<GameScreen> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Message :',
+                  'Message ', 
                   style: GoogleFonts.lato(
                     color: Colors.white38,
                     fontSize: 15.sp,

@@ -337,8 +337,10 @@ class CountryPickerWidget extends StatelessWidget {
   }
 
   void _showCountryPicker(BuildContext context) async {
-    // Get all countries from the package
-    final List<Country> countries = CountryService().getAll();
+        // Get all countries from the package, excluding Ascension Island ('AC') which does not map properly on backend
+    final List<Country> countries = CountryService().getAll()
+        .where((c) => c.countryCode != 'AC')
+        .toList();
     
     // Create a map for easy lookup: "🇮🇳 India" -> Country object
     final Map<String, Country> countryMap = {
@@ -380,4 +382,3 @@ class CountryPickerWidget extends StatelessWidget {
     }
   }
 }
-

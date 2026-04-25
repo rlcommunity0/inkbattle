@@ -59,16 +59,6 @@ class ExitPopUp extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (imagePath != null) ...[
-                SizedBox(
-                  height: isTablet ? 80.h : 90.h,
-                  child: Image.asset(
-                    imagePath!,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                SizedBox(height: 16.h),
-              ],
 
               /// HEADER
               Text(

@@ -90,7 +90,7 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
     final rank3Height = basePodiumHeight * 0.55;
 
     final availableWidth = isTablet ? 550.0 : size.width * 0.9;
-    final podiumWidth = availableWidth / 3.2;
+    final podiumWidth = availableWidth / 3.45;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -128,29 +128,37 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
                     ],
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: isTablet ? 16 : 10, vertical: 16),
+                    // padding: EdgeInsets.symmetric(
+                    //     horizontal: isTablet ? 16 : 10, vertical: 12),
+                    padding: EdgeInsets.fromLTRB(
+                      isTablet ? 16 : 10,  8,   // reduce top gap
+                      isTablet ? 16 : 10, 16),
                     child: Column(
                       children: [
                         /// ---------- EXISTING RIBBON ----------
-                        SizedBox(
-                          height: isTablet ? 90 : 70,
-                          width: double.infinity,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(AppImages.redflg),
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(18),
-                                topRight: Radius.circular(18),
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(18),
+                            topRight: Radius.circular(18),
+                          ),
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: FractionallySizedBox(
+                              // widthFactor: isTablet ? 1.8 : 1.2,
+                              widthFactor: 1.8,
+                              child: AspectRatio(
+                                aspectRatio: 3.5,
+                                child: Image.asset(
+                                  AppImages.redflg,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
                         ),
 
                         const Spacer(),
+                        // SizedBox(height: isTablet ? 18 : 12),
 
                         /// ---------- PODIUM ----------
                         Row(
@@ -159,10 +167,10 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
                           children: [
                             _buildPodiumColumn(
                                 second, 2, rank2Height, podiumWidth, isTablet),
-                            SizedBox(width: isTablet ? 20 : 12),
+                            SizedBox(width: isTablet ? 20 : 8),
                             _buildPodiumColumn(
                                 first, 1, rank1Height, podiumWidth, isTablet),
-                            SizedBox(width: isTablet ? 20 : 12),
+                            SizedBox(width: isTablet ? 20 : 8),
                             _buildPodiumColumn(
                                 third, 3, rank3Height, podiumWidth, isTablet),
                           ],
@@ -274,7 +282,7 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
             child: CircleAvatar(
               radius: isTablet
                   ? (rank == 1 ? 40 : 30)
-                  : (rank == 1 ? 32 : 24),
+                  : (rank == 1 ? 32 : 22),
               backgroundImage: AssetImage(team.avatar),
             ),
           ),
@@ -289,7 +297,7 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
               color: Colors.white,
-              fontSize: isTablet ? 16 : 13,
+              fontSize: isTablet ? 16 : 12,
             ),
           ),
 
@@ -308,7 +316,7 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
-                  fontSize: isTablet ? 16 : 13,
+                  fontSize: isTablet ? 16 : 12,
                 ),
               ),
             ],
