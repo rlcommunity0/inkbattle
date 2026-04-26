@@ -265,7 +265,7 @@ class CountryPickerWidget extends StatelessWidget {
             color: Colors.white, // Always white to match others
             width: isTablet ? 2.0 : 1.w, // Match the 2.0 tablet width from MultiplayerScreen
           ),
-          color: Colors.black.withOpacity(0.35),
+          color: isFilled ? Colors.black.withOpacity(0.35) : Colors.transparent,
         ),
         child: Material(
           color: Colors.transparent,
@@ -337,8 +337,10 @@ class CountryPickerWidget extends StatelessWidget {
   }
 
   void _showCountryPicker(BuildContext context) async {
-    // Get all countries from the package
-    final List<Country> countries = CountryService().getAll();
+        // Get all countries from the package, excluding Ascension Island ('AC') which does not map properly on backend
+    final List<Country> countries = CountryService().getAll()
+        .where((c) => c.countryCode != 'AC')
+        .toList();
     
     // Create a map for easy lookup: "🇮🇳 India" -> Country object
     final Map<String, Country> countryMap = {
@@ -380,4 +382,3 @@ class CountryPickerWidget extends StatelessWidget {
     }
   }
 }
-

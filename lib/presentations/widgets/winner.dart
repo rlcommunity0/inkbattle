@@ -72,15 +72,11 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
-    // Better tablet detection
     final isTablet = size.shortestSide >= 600;
 
-    // Increased slightly to prevent ribbon clipping
     final modalHeightFactor = isTablet ? 0.72 : 0.85;
     final maxWidth = isTablet ? 700.0 : double.infinity;
 
-    // Sort teams
     final sortedTeams = List<Team>.from(widget.teams)
       ..sort((a, b) => b.score.compareTo(a.score));
 
@@ -88,15 +84,13 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
     final second = sortedTeams.length > 1 ? sortedTeams[1] : null;
     final third = sortedTeams.length > 2 ? sortedTeams[2] : null;
 
-    final isTwoPlayers = sortedTeams.length == 2;
-
     final basePodiumHeight = size.height * (isTablet ? 0.18 : 0.20);
     final rank1Height = basePodiumHeight;
     final rank2Height = basePodiumHeight * 0.75;
     final rank3Height = basePodiumHeight * 0.55;
 
     final availableWidth = isTablet ? 550.0 : size.width * 0.9;
-    final podiumWidth = availableWidth / 3.2;
+    final podiumWidth = availableWidth / 3.45;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -114,80 +108,75 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF1C1C30), Color(0xFF0E0E1A)],
+                      colors: [
+                        Color(0xFF0F0F1F),
+                        Color(0xFF090917),
+                        Color(0xFF050510),
+                      ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                     ),
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(20),
                     border:
                         Border.all(color: Colors.blueAccent, width: 1.5),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.blueAccent.withOpacity(0.3),
-                        blurRadius: 12,
+                        blurRadius: 15,
                         spreadRadius: 1,
                       )
                     ],
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: isTablet ? 16 : 8, vertical: 16),
+                    // padding: EdgeInsets.symmetric(
+                    //     horizontal: isTablet ? 16 : 10, vertical: 12),
+                    padding: EdgeInsets.fromLTRB(
+                      isTablet ? 16 : 10,  8,   // reduce top gap
+                      isTablet ? 16 : 10, 16),
                     child: Column(
                       children: [
-                        /// ---------- RIBBON (FIXED HEIGHT) ----------
-                        SizedBox(
-                          height: isTablet ? 90 : 70,
-                          width: double.infinity,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(AppImages.redflg),
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(18),
-                                topRight: Radius.circular(18),
+                        /// ---------- EXISTING RIBBON ----------
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(18),
+                            topRight: Radius.circular(18),
+                          ),
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: FractionallySizedBox(
+                              // widthFactor: isTablet ? 1.8 : 1.2,
+                              widthFactor: 1.8,
+                              child: AspectRatio(
+                                aspectRatio: 3.5,
+                                child: Image.asset(
+                                  AppImages.redflg,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
                         ),
 
-                        /// replaces Spacer()
-                        const Flexible(
-                          fit: FlexFit.loose,
-                          child: SizedBox(),
-                        ),
+                        const Spacer(),
+                        // SizedBox(height: isTablet ? 18 : 12),
 
                         /// ---------- PODIUM ----------
-                        SizedBox(
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (isTwoPlayers) ...[
-                                _buildPodiumColumn(second, 2, rank2Height,
-                                    podiumWidth, isTablet),
-                                SizedBox(width: isTablet ? 20 : 10),
-                                _buildPodiumColumn(first, 1, rank1Height,
-                                    podiumWidth, isTablet),
-                              ] else ...[
-                                _buildPodiumColumn(second, 2, rank2Height,
-                                    podiumWidth, isTablet),
-                                _buildPodiumColumn(first, 1, rank1Height,
-                                    podiumWidth, isTablet),
-                                _buildPodiumColumn(third, 3, rank3Height,
-                                    podiumWidth, isTablet),
-                              ]
-                            ],
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _buildPodiumColumn(
+                                second, 2, rank2Height, podiumWidth, isTablet),
+                            SizedBox(width: isTablet ? 20 : 8),
+                            _buildPodiumColumn(
+                                first, 1, rank1Height, podiumWidth, isTablet),
+                            SizedBox(width: isTablet ? 20 : 8),
+                            _buildPodiumColumn(
+                                third, 3, rank3Height, podiumWidth, isTablet),
+                          ],
                         ),
 
-                        /// replaces Spacer()
-                        const Flexible(
-                          fit: FlexFit.loose,
-                          child: SizedBox(),
-                        ),
+                        const Spacer(),
 
                         /// ---------- NEXT BUTTON ----------
                         GestureDetector(
@@ -196,24 +185,31 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
                             Navigator.pop(context);
                           },
                           child: Container(
-                            width: 180,
-                            height: 50,
+                            width: isTablet ? 260 : 200,
+                            height: isTablet ? 60 : 50,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [
-                                  Colors.blueAccent,
-                                  Colors.lightBlue
+                                  Color(0xFF2BC0E4),
+                                  Color(0xFF1B7BFF),
                                 ],
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.blueAccent.withOpacity(0.5),
+                                  blurRadius: 12,
+                                  spreadRadius: 1,
+                                )
+                              ],
                             ),
-                            child: const Text(
-                              "NEXT",
-                              style: TextStyle(
+                            child: Text(
+                              "NEXT  >>",
+                              style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
-                                fontSize: 16,
+                                fontSize: isTablet ? 18 : 15,
                               ),
                             ),
                           ),
@@ -227,10 +223,7 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
             ),
           ),
 
-          /// ---------- LOTTIE OVERLAY ----------
-          /// unchanged
-          /// visible
-          /// does NOT block touches
+          /// ---------- LOTTIE ----------
           if (widget.isWinner)
             Positioned.fill(
               child: IgnorePointer(
@@ -267,54 +260,87 @@ class _TeamWinnerPopupState extends State<TeamWinnerPopup> {
       width: width,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          CircleAvatar(
-            radius: isTablet ? (rank == 1 ? 35 : 28) : (rank == 1 ? 28 : 22),
-            backgroundImage: AssetImage(team.avatar),
-            backgroundColor: Colors.grey.shade800,
+          /// ---------- AVATAR WITH GLOW ----------
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: rank == 1 ? Colors.amber : Colors.white24,
+                width: rank == 1 ? 3 : 1.5,
+              ),
+              boxShadow: rank == 1
+                  ? [
+                      BoxShadow(
+                        color: Colors.amber.withOpacity(0.6),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                      )
+                    ]
+                  : [],
+            ),
+            child: CircleAvatar(
+              radius: isTablet
+                  ? (rank == 1 ? 40 : 30)
+                  : (rank == 1 ? 32 : 22),
+              backgroundImage: AssetImage(team.avatar),
+            ),
           ),
-          const SizedBox(height: 6),
 
+          const SizedBox(height: 8),
+
+          /// ---------- NAME ----------
+          Text(
+            team.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontSize: isTablet ? 16 : 12,
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          /// ---------- SCORE ----------
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(
-                child: Text(
-                  team.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.lato(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    fontSize: isTablet ? 16 : 13,
-                  ),
+              Icon(Icons.monetization_on,
+                  color: Colors.amber,
+                  size: isTablet ? 18 : 14),
+              const SizedBox(width: 4),
+              Text(
+                "${team.score}",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: isTablet ? 16 : 12,
                 ),
               ),
-              if (team.isCurrentUser) ...[
-                const SizedBox(width: 4),
-                Icon(Icons.star,
-                    color: Colors.amber,
-                    size: isTablet ? 18 : 14),
-              ]
             ],
           ),
 
-          Text(
-            "${team.score}",
-            style: GoogleFonts.lato(
-              fontWeight: FontWeight.bold,
-              color: Colors.amber,
-              fontSize: isTablet ? 18 : 15,
-            ),
-          ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
 
-          SizedBox(
-            height: height,
-            width: width,
-            child: Image.asset(asset, fit: BoxFit.fill),
+          /// ---------- PODIUM ----------
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                )
+              ],
+            ),
+            child: SizedBox(
+              height: height,
+              width: width,
+              child: Image.asset(asset, fit: BoxFit.fill),
+            ),
           ),
         ],
       ),

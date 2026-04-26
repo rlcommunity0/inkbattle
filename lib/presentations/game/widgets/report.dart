@@ -46,8 +46,8 @@ class ErrorPopup extends StatelessWidget {
             children: [
               Image.asset(
                 AppImages.reportlogo,
-                width: 40.w,
-                height: 40.w,
+                width: isTablet ? 65.w : 40.w,
+                height: isTablet ? 65.w : 40.w,
               ),
             ],
           ),

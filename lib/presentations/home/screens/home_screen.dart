@@ -237,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               child,
               // Red notification at top-right, slightly overlapping (Figma)
-              if (showNotification)
+              /* if (showNotification)
                 Positioned(
                   top: isTablet ? -10 : -6,
                   right: isTablet ? -10 : -6,
@@ -256,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ],
                     ),
                   ),
-                ),
+                ), */
             ],
           ),
         ),
@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   /// Same font and style as Play Random / Multiplayer / Friends (CustomRoomButton).
   Widget _buildCircleButtonText(String text, bool isTablet) {
-    final double textSize = isTablet ? 12.sp : 13.sp;
+    final double textSize = isTablet ? 8.sp : 13.sp;
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -695,9 +695,9 @@ class _CustomTopBarState extends State<CustomTopBar> {
                     ),
                   ),
 
-                  SizedBox(width: 8.w),
+                  // SizedBox(width: 8.w),
 
-                  Material(
+                  /* Material(
                     color: Colors.transparent,
                     child: Container(
                       decoration: BoxDecoration(
@@ -722,7 +722,7 @@ class _CustomTopBarState extends State<CustomTopBar> {
                         ),
                       ),
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ),

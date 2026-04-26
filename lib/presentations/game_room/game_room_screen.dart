@@ -195,13 +195,13 @@ class _PhaseBorderPainter extends CustomPainter {
 class _DrawerMessageOption {
   final String key;
   final String label;
-  final String iconPath;
+  final IconData icon;
   final Color accentColor;
 
   const _DrawerMessageOption({
     required this.key,
     required this.label,
-    required this.iconPath,
+    required this.icon,
     required this.accentColor,
   });
 }
@@ -335,25 +335,25 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     _DrawerMessageOption(
       key: AppLocalizations.correct,
       label: AppLocalizations.correct,
-      iconPath: AppImages.messageCorrect,
+      icon: Icons.check_rounded,
       accentColor: const Color(0xFF3EE07F),
     ),
     _DrawerMessageOption(
       key: AppLocalizations.wrong,
       label: AppLocalizations.wrong,
-      iconPath: AppImages.messageWrong,
+      icon: Icons.close_rounded,
       accentColor: const Color(0xFFE53935),
     ),
     _DrawerMessageOption(
       key: AppLocalizations.breakWord,
       label: AppLocalizations.breakWord,
-      iconPath: AppImages.messageBreakWord,
+      icon: Icons.call_split_rounded,
       accentColor: const Color(0xFF57C6FF),
     ),
     _DrawerMessageOption(
       key: AppLocalizations.alternate,
       label: AppLocalizations.alternate,
-      iconPath: AppImages.messageAlternate,
+      icon: Icons.swap_horiz_rounded,
       accentColor: const Color(0xFFFFC857),
     ),
   ];
@@ -458,7 +458,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   int? selectedPoints;
   List<String> selectedCategories = [];
   String? selectedGameMode = '1v1';
-  bool voiceEnabled = false;
+    bool voiceEnabled = false;
   bool isPublic = false;
   int maxPlayers = 5;
   String? selectedTeam;
@@ -1124,12 +1124,12 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               selectedScript = 'default';
             } else {
               // For non-English languages, use room.script or default to 'default'
-              selectedScript = room.script ?? 'default';
+              selectedScript = room.script;
             }
             selectedCountry = room.country;
             selectedPoints = room.pointsTarget != null && pointsOptions.contains(room.pointsTarget)
                 ? room.pointsTarget!
-                : pointsOptions.first;
+                : null;
             // Handle category as array or string (for backward compatibility)
             final categoryValue = room.category;
             if (categoryValue != null) {
@@ -1143,7 +1143,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             } else {
               selectedCategories = [];
             }
-            selectedGameMode = room.gameMode ?? '1v1';
+            selectedGameMode = room.gameMode;
             voiceEnabled = room.voiceEnabled ?? false;
             isPublic = room.isPublic ?? false;
             // Default to 5 if maxPlayers is null or 0 (for UI display)
@@ -4940,14 +4940,13 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               child: Column(
                 children: [
                   _buildGameTopBar(),
-                  SizedBox(height: 5.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12.w),
                     child: _buildBoardArea(boardHeight),
                   ),
                   _buildControlsRow(),
                   _buildChatArea(),
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 4.h), // Tighten spacing to bottom edge
                 ],
               ),
             ),
@@ -5597,15 +5596,16 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         minWidth: 200.w,
         minHeight: 100.h,
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
           SizedBox(height: 12.h),
           _AnimationVideo(
             controller: _intervalVideoController,
-            width: 160.w,
-            height: 100.h,
+            size: 160.w,
           ),
           SizedBox(height: 12.h),
           Text(
@@ -5672,6 +5672,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           // ),
         ],
       ),
+      ),
     );
   }
 
@@ -5685,17 +5686,18 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         minWidth: 200.w,
         minHeight: 100.h,
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
           SizedBox(height: 24.h),
           _AnimationVideo(
             controller: userAnsweredCorrectly
                 ? _welldoneVideoController
                 : _timeupVideoController,
-            width: 160.w,
-            height: 160.h,
+            size: 160.w,
           ),
           SizedBox(height: 12.h),
           if (!userAnsweredCorrectly)
@@ -5720,6 +5722,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               )),
           _buildLetterDashes(_currentWord ?? "")
         ],
+      ),
       ),
     );
   }
@@ -5771,8 +5774,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               SizedBox(height: 24.h),
               _AnimationVideo(
                 controller: _whosNextVideoController,
-                width: 160.w,
-                height: 160.h,
+                size: 160.w,
               ),
               // Renders the animated selection
               DrawerSelectionRoller(
@@ -5876,15 +5878,16 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         minWidth: 200.w,
         minHeight: 100.h,
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
           SizedBox(height: 24.h),
           _AnimationVideo(
             controller: _lostTurnVideoController,
-            width: 160.w,
-            height: 160.h,
+            size: 160.w,
           ),
           SizedBox(height: 24.h),
           Row(
@@ -5943,6 +5946,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           // ),
         ],
       ),
+      ),
     );
   }
 
@@ -5956,10 +5960,12 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         minWidth: 200.w,
         minHeight: 100.h,
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
           Image.asset(
             'asset/image/next.png',
             width: 160.w,
@@ -6018,6 +6024,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           //   ),
           // ),
         ],
+      ),
       ),
     );
   }
@@ -6193,7 +6200,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                               Expanded(
                                 child: !_isEnglishLanguage(selectedLanguage)
                                     ? _buildLobbyFilterPill(
-                                        hint: 'Default',
+                                        hint: 'Native',
                                         value: selectedScript,
                                         items: scripts,
                                         icon: Icons.text_fields,
@@ -7464,6 +7471,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   Widget _buildLobbyFilterPill({
     required String hint,
     required String? value,
+    String? defaultDropdownValue,
     required List<String> items,
     required IconData icon,
     Color iconColor = Colors.white70,
@@ -7472,13 +7480,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     required String Function(String) getDisplayValue,
   }) {
     final displayValue = value ?? hint;
+    final isSelected = value != null;
     return Container(
       height: isTablet ? 65.0 : 45.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25.r),
         border: Border.all(
             color: Colors.white, width: isTablet ? 2.0 : 1.w),
-        color: Colors.black.withOpacity(0.35),
+        color: isSelected ? Colors.black.withOpacity(0.35) : Colors.transparent,
       ),
       child: Material(
         color: Colors.transparent,
@@ -7495,7 +7504,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     builder: (context) => SelectionBottomSheet(
                       title: hint,
                       items: items,
-                      selectedItem: value,
+                      selectedItem: value ?? defaultDropdownValue,
                     ),
                   );
                   if (result != null) onChanged(result);
@@ -7520,7 +7529,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     softWrap: false,
                     textAlign: TextAlign.left,
                     style: GoogleFonts.lato(
-                      color: Colors.white,
+                      color: isSelected ? Colors.white : Colors.white54,
                       fontSize: isTablet ? 22.0 : 13.sp,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
@@ -7529,7 +7538,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 ),
                 SizedBox(width: isTablet ? 10.0 : 6.w),
                 Icon(Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white70,
+                    color: isSelected ? Colors.white : Colors.white54,
                     size: isTablet ? 32.0 : 16.sp),
               ],
             ),
@@ -7549,6 +7558,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     required ValueChanged<List<String>>? onChanged,
     required String Function(String) getDisplayValue,
   }) {
+    final isSelected = selectedValues.isNotEmpty;
     final displayText = selectedValues.isEmpty
         ? hint
         : selectedValues.length == 1
@@ -7560,7 +7570,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         borderRadius: BorderRadius.circular(25.r),
         border: Border.all(
             color: Colors.white, width: isTablet ? 2.0 : 1.w),
-        color: Colors.black.withOpacity(0.35),
+        color: isSelected ? Colors.black.withOpacity(0.35) : Colors.transparent,
       ),
       child: Material(
         color: Colors.transparent,
@@ -7615,7 +7625,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 ),
                 SizedBox(width: isTablet ? 10.0 : 6.w),
                 Icon(Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white70,
+                    color: isSelected ? Colors.white : Colors.white54,
                     size: isTablet ? 32.0 : 16.sp),
               ],
             ),
@@ -7629,18 +7639,19 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     required bool isOwner,
     required bool isTablet,
   }) {
+    final bool isSelected = selectedGameMode != null;
     final displayValue = selectedGameMode == '1v1'
         ? AppLocalizations.individual
         : selectedGameMode == 'team_vs_team'
             ? AppLocalizations.team
-            : AppLocalizations.individual;
+            : 'Game Play';
     return Container(
       height: isTablet ? 65.0 : 45.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25.r),
         border: Border.all(
             color: Colors.white, width: isTablet ? 2.0 : 1.w),
-        color: const Color(0xFF0E0E),
+        color: isSelected ? const Color(0xFF0E0E) : Colors.transparent,
       ),
       child: Material(
         color: Colors.transparent,
@@ -7695,7 +7706,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     softWrap: false,
                     textAlign: TextAlign.left,
                     style: GoogleFonts.lato(
-                      color: Colors.white,
+                      color: isSelected ? Colors.white : Colors.white54,
                       fontSize: isTablet ? 22.0 : 13.sp,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
@@ -7704,7 +7715,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 ),
                 SizedBox(width: isTablet ? 10.0 : 6.w),
                 Icon(Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white70,
+                    color: isSelected ? Colors.white : Colors.white54,
                     size: isTablet ? 32.0 : 16.sp),
               ],
             ),
@@ -10251,18 +10262,17 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               child: Row(
                 children: [
                   Container(
-                    width: 28.w,
-                    height: 28.h,
+                    width: isTablet ? 36.0 : 28.w,
+                    height: isTablet ? 36.0 : 28.h,
                     decoration: BoxDecoration(
                       color: option.accentColor.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Center(
-                      child: Image.asset(
-                        option.iconPath,
-                        width: 20.w,
-                        height: 20.h,
-                        fit: BoxFit.contain,
+                      child: Icon(
+                        option.icon,
+                        color: option.accentColor,
+                        size: isTablet ? 24.0 : 20.sp,
                       ),
                     ),
                   ),
@@ -10271,7 +10281,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     option.label,
                     style: GoogleFonts.lato(
                       color: Colors.white,
-                      fontSize: 14.sp,
+                      fontSize: isTablet ? 18.0 : 14.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -10301,7 +10311,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   'Send Message',
                   style: GoogleFonts.lato(
                     color: Colors.white,
-                    fontSize: 16.sp,
+                    fontSize: isTablet ? 22.0 : 16.sp,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -10590,6 +10600,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
     final String userName = currentParticipant.user?.name ?? 'Player';
     final int score = currentParticipant.score ?? 0;
+    final isTablet = MediaQuery.of(context).size.width > 600;
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -10599,62 +10610,51 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           Container(
             key: ValueKey(
                 'one-vs-one-${currentParticipant.user?.id ?? 'none'}-$score'),
-            margin: EdgeInsets.only(left: 22.w),
-            padding: EdgeInsets.symmetric(horizontal: 26.w, vertical: 8.h),
-            constraints: BoxConstraints(maxWidth: 180.w),
+            height: isTablet ? 55.0 : 40.h,
+            padding: EdgeInsets.all(isTablet ? 2.0 : 1.5), // Avoid overlapping border
             decoration: BoxDecoration(
-              color: const Color(0xFF13131F),
-              borderRadius: BorderRadius.circular(24.r),
-              border:
-                  Border.all(color: Colors.white.withOpacity(0.25), width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.45),
-                  blurRadius: 10.r,
-                  offset: const Offset(0, 4),
+              color: const Color(0xFF181A20), 
+              borderRadius: BorderRadius.circular(isTablet ? 27.5 : 20.r),
+              border: Border.all(color: Colors.white, width: isTablet ? 2.0 : 1.5),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Score section (Blue perfect circle)
+                AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF00BFFF), 
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '$score',
+                      style: GoogleFonts.lato(
+                        color: Colors.black, // Dark text on bright blue
+                        fontSize: isTablet ? 20.0 : 14.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                // Username section
+                Padding(
+                  padding: EdgeInsets.only(left: isTablet ? 12.0 : 8.w, right: isTablet ? 16.0 : 12.w),
+                  child: Text(
+                    userName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.lato(
+                      color: Colors.white,
+                      fontSize: isTablet ? 20.0 : 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
-            ),
-            child: Text(
-              userName,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.2,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 38.w,
-              height: 38.h,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1F1F2A),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.6),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.45),
-                    blurRadius: 8.r,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '$score',
-                style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
             ),
           ),
           // Floating Animation (Visible for both Drawer and Guesser)
@@ -10704,7 +10704,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
     // Build option tile widget helper to reduce code duplication
     Widget _buildOptionTile({
-      required String imageAsset,
+      required IconData icon,
+      required Color accentColor,
       required String label,
       required VoidCallback onTap,
     }) {
@@ -10719,9 +10720,10 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               SizedBox(
                 height: optionIconSize,
                 width: optionIconSize,
-                child: Image.asset(
-                  imageAsset,
-                  fit: BoxFit.contain,
+                child: Icon(
+                  icon,
+                  color: accentColor,
+                  size: optionIconSize,
                 ),
               ),
               SizedBox(width: 12.w),
@@ -10742,7 +10744,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 
     final List<Widget> optionTiles = [
       _buildOptionTile(
-        imageAsset: AppImages.correct,
+        icon: _drawerMessageOptions[0].icon,
+        accentColor: _drawerMessageOptions[0].accentColor,
         label: AppLocalizations.correct,
         onTap: () {
           setState(() {
@@ -10752,7 +10755,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         },
       ),
       _buildOptionTile(
-        imageAsset: AppImages.wrong,
+        icon: _drawerMessageOptions[1].icon,
+        accentColor: _drawerMessageOptions[1].accentColor,
         label: AppLocalizations.wrong,
         onTap: () {
           setState(() {
@@ -10762,7 +10766,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         },
       ),
       _buildOptionTile(
-        imageAsset: AppImages.breakWord,
+        icon: _drawerMessageOptions[2].icon,
+        accentColor: _drawerMessageOptions[2].accentColor,
         label: AppLocalizations.breakWord,
         onTap: () {
           setState(() {
@@ -10772,7 +10777,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         },
       ),
       _buildOptionTile(
-        imageAsset: AppImages.alternateWord,
+        icon: _drawerMessageOptions[3].icon,
+        accentColor: _drawerMessageOptions[3].accentColor,
         label: AppLocalizations.alternate,
         onTap: () {
           setState(() {
@@ -10857,7 +10863,6 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             child: Container(
               height: mainIconSize,
               width: mainIconSize,
-              padding: EdgeInsets.all(4.w),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -10869,9 +10874,13 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   ),
                 ],
               ),
-              child: Image.asset(
-                AppImages.optionIcon,
-                fit: BoxFit.contain,
+              child: Center(
+                child: Image.asset(
+                  AppImages.optionIcon,
+                  width: mainIconSize * 0.55,
+                  height: mainIconSize * 0.55,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
@@ -11412,19 +11421,15 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     final double topBarHorizontal = isTablet ? 16.w : 12.w;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isTablet ? 12.w : 8.w),
-      child: Container(
-        constraints: BoxConstraints(
-          minHeight: isTablet ? 56.h : 48.h,
-        ),
-        padding: EdgeInsets.symmetric(horizontal: topBarHorizontal, vertical: topBarVertical),
-        decoration: BoxDecoration(
-          color: const Color(0xFF000000),
-          borderRadius: BorderRadius.circular(isTablet ? 14.r : 12.r),
-        ),
-        child: Row(
-          children: [
-            // Wrap the Room ID Pill (representing the current user) with the Speaking Indicator
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 12.w : 8.w,
+        vertical: topBarVertical,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Wrap the Room ID Pill (representing the current user) with the Speaking Indicator
             _SpeakingIndicatorOverlay(
               isSpeaking: voiceEnabled &&
                   _speakingInGameUserIds.contains(_currentUser?.id),
@@ -11460,15 +11465,17 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   key: showcasekey2,
                   child: _copyableRoomIdPill(roomId)),
             ),
-            SizedBox(width: 5.w),
-            Expanded(
-              child: Center(
+            SizedBox(width: isTablet ? 16.w : 6.w),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: (isPlaying && _participants.isNotEmpty)
                       ? _toggleLeaderboard
                       : null,
-                  child: AnimatedSwitcher(
+              child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 500),
                       transitionBuilder:
                           (Widget child, Animation<double> animation) {
@@ -11514,15 +11521,18 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                         description: "Click to View top players and scores",
 
                         /// 👇 ADD width + height here
-                        child: Center(child: centerContent),
+                        child: centerContent,
                       )),
                 ),
               ),
             ),
-            SizedBox(width: 5.w),
-            GestureDetector(
-              onTap: () {
-                 _toggleLeaderboard();
+            SizedBox(width: isTablet ? 16.w : 6.w),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                     _toggleLeaderboard();
                  return;
                 List<Team> teams = [];
                 if (isTeamMode) {
@@ -11651,18 +11661,16 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                         ? AppLocalizations.public
                         : AppLocalizations.private,
                     color: (isPublic)
-                        ? Colors.green
-                        : const Color.fromARGB(255, 190, 30, 19),
+                        ? const Color(0xFF4CAF50)
+                        : const Color(0xFFFF0000), // Exactly matching Figma bright red
                     textColor: Colors.white,
-                    width: 70.w,
-                    leading: Image.asset(
-                      AppImages.circleprivate,
-                      height: 18.h,
-                      width: 18.w,
-                    )),
+                    width: isTablet ? null : 90.w,
+                    spacing: isTablet ? 8.0 : 6.w,
+                    leading: const AnimatedPulsingDot(color: Colors.white),
+                ),
               ),
             ),
-            SizedBox(width: 5.w),
+            SizedBox(width: 8.w),
             GestureDetector(
               onTap: () {
                 showDialog(
@@ -11677,11 +11685,16 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   },
                 );
               },
-              child: Image.asset(AppImages.exitgame, width: 30.w, height: 30.h),
+              child: Icon(
+                Icons.logout,
+                color: Colors.white70,
+                size: isTablet ? 32.0 : 24.sp,
+              ),
+            ),
+              ],
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -11727,14 +11740,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               isSelected: _currentTool == DrawingTool.rectangle,
               onTap: () => Navigator.of(context).pop(DrawingTool.rectangle)),
           // Color Picker (Action)
-          _buildToolButton(
-              child:
-                  Image.asset(AppImages.colorPicker, width: 20.w, height: 20.h),
-              onTap: () => Navigator.of(context).pop('color_picker')),
+          // _buildToolButton(
+          //     child:
+          //         Image.asset(AppImages.colorPicker, width: 20.w, height: 20.h),
+          //     onTap: () => Navigator.of(context).pop('color_picker')),
           // Undo (Action)
-          _buildToolButton(
-              child: Image.asset(AppImages.undo, width: 20.w, height: 20.h),
-              onTap: () => Navigator.of(context).pop('undo')),
+          // _buildToolButton(
+          //     child: Image.asset(AppImages.undo, width: 20.w, height: 20.h),
+          //     onTap: () => Navigator.of(context).pop('undo')),
         ],
       ),
       const SizedBox(height: 4),
@@ -11762,14 +11775,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               onTap: () =>
                   Navigator.of(context).pop(DrawingTool.filledRectangle)),
           // Clear Canvas (Bucket Fill Action)
-          _buildToolButton(
-              child:
-                  Image.asset(AppImages.bucketFill, width: 20.w, height: 20.h),
-              onTap: () => Navigator.of(context).pop('clear_canvas')),
+          // _buildToolButton(
+          //     child:
+          //         Image.asset(AppImages.bucketFill, width: 20.w, height: 20.h),
+          //     onTap: () => Navigator.of(context).pop('clear_canvas')),
           // Redo (Action)
-          _buildToolButton(
-              child: Image.asset(AppImages.redo, width: 20.w, height: 20.h),
-              onTap: () => Navigator.of(context).pop('redo')),
+          // _buildToolButton(
+          //     child: Image.asset(AppImages.redo, width: 20.w, height: 20.h),
+          //     onTap: () => Navigator.of(context).pop('redo')),
         ],
       ),
     ];
@@ -11995,6 +12008,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   }
 
   Widget _copyableRoomIdPill(String roomId) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
     return GestureDetector(
       onTap: () async {
         await Clipboard.setData(ClipboardData(text: roomId));
@@ -12003,12 +12017,45 @@ class _GameRoomScreenState extends State<GameRoomScreen>
           if (mounted) setState(() => _copied = false);
         });
       },
-      child: _pill(_copied ? 'Copied!' : roomId,
-          color: const Color(0xFF1B1C2A),
-          textColor: Colors.white,
-          width: 100.w,
-          spacing: 25.w,
-          leading: _buildCountryFlag(selectedCountry, false),
+      child: Container(
+        height: isTablet ? 55.0 : 40.h,
+        padding: EdgeInsets.symmetric(horizontal: isTablet ? 16.0 : 10.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFF181A20), 
+          borderRadius: BorderRadius.circular(isTablet ? 27.5 : 20.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Container(
+            //   width: isTablet ? 30.0 : 22.w,
+            //   height: isTablet ? 30.0 : 22.w,
+            //   decoration: const BoxDecoration(
+            //     shape: BoxShape.circle,
+            //   ),
+            //   clipBehavior: Clip.hardEdge,
+            //   alignment: Alignment.center,
+            //   child: Transform.scale(
+            //     scale: 1.35, // Upscale to eliminate emoji bounding box paddings and perfectly fill the clipping circle
+            //     child: FittedBox(
+            //       fit: BoxFit.cover,
+            //       child: _buildCountryFlag(selectedCountry, false),
+            //     ),
+            //   ),
+            // ),
+            _buildCountryFlag(selectedCountry, false),
+            SizedBox(width: isTablet ? 12.0 : 8.w),
+            Text(
+              _copied ? 'Copied' : roomId,
+              style: GoogleFonts.lato(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: isTablet ? 20.0 : 14.sp,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -12021,26 +12068,32 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     double? width,
     double? spacing,
   }) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+      height: isTablet ? 55.0 : 40.h,
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 20.0 : 12.w,
+      ),
       width: width,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(isTablet ? 27.5 : 20.r),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (leading != null) ...[
             leading,
-            SizedBox(width: spacing ?? 2.w),
+            SizedBox(width: spacing ?? (isTablet ? 8.0 : 6.w)),
           ],
           Text(
             text,
-            style: TextStyle(
+            style: GoogleFonts.lato(
               color: textColor,
               fontWeight: FontWeight.w600,
-              fontSize: 10.sp,
+              fontSize: isTablet ? 20.0 : 14.sp,
             ),
           ),
         ],
@@ -12053,31 +12106,53 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       return const SizedBox.shrink();
     }
     final isTablet = MediaQuery.of(context).size.width > 600;
-    double addParam = isTablet ? 5.w : 0;
-    double fontSize = isProfile ? 18.sp + addParam : 14.sp + addParam;
+    // double addParam = isTablet ? 5.w : 0;
+    // double fontSize = isProfile ? 18.sp + addParam : 14.sp + addParam;
 
-    // 3. Use the getCountryFlag method (from CountryPickerWidget or your local utility)
-    // This returns the emoji string (e.g., "🇺🇸") instead of a path to a PNG.
-    return Text(
-      CountryPickerWidget.getCountryFlag(countryCode),
-      style: TextStyle( color: Colors.white, fontSize: fontSize,),
-    );
-    // return ClipOval(
-    //   child: Image.asset(
-    //     'asset/flags/${countryCode.toLowerCase()}.png',
-    //     width: isProfile ? 18.w + addParam : 14.w + addParam,
-    //     height: isProfile ? 18.h + addParam : 14.h + addParam,
-    //     fit: BoxFit.cover,
-    //     errorBuilder: (_, __, ___) {
-    //       // Fallback if flag missing
-    //       return Image.asset(
-    //         AppImages.circleflag,
-    //         width: isProfile ? 18.w + addParam : 14.w + addParam,
-    //         height: isProfile ? 18.h + addParam : 14.h + addParam,
-    //       );
-    //     },
-    //   ),
+    // // 3. Use the getCountryFlag method (from CountryPickerWidget or your local utility)
+    // // This returns the emoji string (e.g., "🇺🇸") instead of a path to a PNG.
+    // return Text(
+    //   CountryPickerWidget.getCountryFlag(countryCode),
+    //   style: TextStyle( color: Colors.white, fontSize: fontSize,),
     // );
+    // // return ClipOval(
+    // //   child: Image.asset(
+    // //     'asset/flags/${countryCode.toLowerCase()}.png',
+    // //     width: isProfile ? 18.w + addParam : 14.w + addParam,
+    // //     height: isProfile ? 18.h + addParam : 14.h + addParam,
+    // //     fit: BoxFit.cover,
+    // //     errorBuilder: (_, __, ___) {
+    // //       // Fallback if flag missing
+    // //       return Image.asset(
+    // //         AppImages.circleflag,
+    // //         width: isProfile ? 18.w + addParam : 14.w + addParam,
+    // //         height: isProfile ? 18.h + addParam : 14.h + addParam,
+    // //       );
+    // //     },
+    // //   ),
+    // // );
+    // Explicit Image sizes for Mobile vs Tablet
+    double mobileSize = isProfile ? 18.w : 14.w;
+    double tabletSize = isProfile ? 30.0 : 25.0; // <--- CHANGE TABLET IMAGE SIZE HERE
+
+    double imageSize = isTablet ? tabletSize : mobileSize;
+
+    return ClipOval(
+      child: Image.asset(
+        'asset/flags/${countryCode.toLowerCase()}.png',
+        width: imageSize,
+        height: imageSize,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) {
+          // Fallback if flag missing
+          return Image.asset(
+            AppImages.circleflag,
+            width: imageSize,
+            height: imageSize,
+          );
+        },
+      ),
+    );
   }
 
 
@@ -12592,7 +12667,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row 1: [eraser circle rectangle undo]
+          // Row 1: [eraser circle rectangle]
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -12614,59 +12689,32 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     /* Rectangle Logic */
                     setState(() => _showPencilTools = false);
                   }),
+            ],
+          ),
+          // Row 2: [ pencil circle_filled rectangle_filled]
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               _buildToolButton(
-                  child: Image.asset(AppImages.bucketFill),
+                  isSelected: true, // Example: Pencil is selected
+                  child: Image.asset(AppImages.drawingPencil),
                   onTap: () {
-                    /* Undo Logic */
+                    /* Pencil Logic */
                     setState(() => _showPencilTools = false);
                   }),
               _buildToolButton(
-                  child: Image.asset(AppImages.redo),
+                  child: Image.asset(AppImages.circleFilled),
                   onTap: () {
-                    /* Undo Logic */
+                    /* Filled Circle Logic */
+                    setState(() => _showPencilTools = false);
+                  }),
+              _buildToolButton(
+                  child: Image.asset(AppImages.rectangleFilled),
+                  onTap: () {
+                    /* Filled Rectangle Logic */
                     setState(() => _showPencilTools = false);
                   }),
             ],
-          ),
-          // Row 2: [ pencil circle_filled rectangle_filled color_picker redo]
-          SizedBox(
-            width: 100.w,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildToolButton(
-                    isSelected: true, // Example: Pencil is selected
-                    child: Image.asset(AppImages.drawingPencil),
-                    onTap: () {
-                      /* Pencil Logic */
-                      setState(() => _showPencilTools = false);
-                    }),
-                _buildToolButton(
-                    child: Image.asset(AppImages.circleFilled),
-                    onTap: () {
-                      /* Filled Circle Logic */
-                      setState(() => _showPencilTools = false);
-                    }),
-                _buildToolButton(
-                    child: Image.asset(AppImages.rectangleFilled),
-                    onTap: () {
-                      /* Filled Rectangle Logic */
-                      setState(() => _showPencilTools = false);
-                    }),
-                _buildToolButton(
-                    child: Image.asset(AppImages.colorPicker),
-                    onTap: () {
-                      /* Color Picker Logic */
-                      setState(() => _showPencilTools = false);
-                    }),
-                _buildToolButton(
-                    child: Image.asset(AppImages.redo),
-                    onTap: () {
-                      /* Redo Logic */
-                      setState(() => _showPencilTools = false);
-                    }),
-              ],
-            ),
           ),
         ],
       ),
@@ -12675,19 +12723,20 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+        padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 28.h), // Increased bottom padding to lift tools above the green border
         child: Stack(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Pencil Icon (Now toggles the pop-up)
                 GestureDetector(
                   onTapDown: (details) => _showPencilToolsPopup(details),
                   child: Container(
                     key: _pencilKey, // Attach here
-                    height: 40,
-                    width: 40,
-                    margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                    height: 48,
+                    width: 48,
+                    margin: EdgeInsets.symmetric(horizontal: 4.w),
                     decoration: BoxDecoration(
                       border: Border.all(
                         color: _isDrawer ? Colors.white : Colors.grey,
@@ -12704,9 +12753,9 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   onTapDown: (details) => _showThicknessOpacityPopup(details),
                   child: Container(
                     // Keep original styling
-                    height: 40,
-                    width: 40,
-                    margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                    height: 48,
+                    width: 48,
+                    margin: EdgeInsets.symmetric(horizontal: 4.w),
                     decoration: BoxDecoration(
                       border: Border.all(
                           color: _isDrawer ? Colors.white : Colors.grey,
@@ -12839,9 +12888,9 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     );
                   },
                   child: Container(
-                    height: 40,
-                    width: 40,
-                    margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                    height: 48,
+                    width: 48,
+                    margin: EdgeInsets.symmetric(horizontal: 4.w),
                     decoration: BoxDecoration(
                       border: Border.all(
                           color: _isDrawer ? Colors.white : Colors.grey,
@@ -12853,16 +12902,15 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 ),
 
                 Badge(
-                  offset: const Offset(0, 2),
+                  offset: const Offset(4, -4),
                   backgroundColor: Colors.black,
                   label: Text("$_hintsRemaining"),
                   child: GestureDetector(
                     onTap: isActive ? _useHint : null,
                     child: Container(
-                      height: 40,
-                      width: 40,
-                      alignment: Alignment.topRight,
-                      margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                      height: 48,
+                      width: 48,
+                      margin: EdgeInsets.symmetric(horizontal: 4.w),
                       decoration: BoxDecoration(
                         border: Border.all(
                             color: _isDrawer ? Colors.white : Colors.grey,
@@ -12883,81 +12931,144 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 // Color Palette (Expanded)
                 Expanded(
                   child: Container(
-                    height: 40,
-                    margin: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                    height: 48,
+                    margin: EdgeInsets.symmetric(horizontal: 4.w),
                     decoration: BoxDecoration(
                       border: Border.all(
                           color: _isDrawer ? Colors.white : Colors.grey,
                           width: 2),
                       borderRadius: const BorderRadius.all(Radius.circular(3)),
                     ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              ..._colorPalette
-                                  .sublist(
-                                      0, (_colorPalette.length / 2).toInt())
-                                  .map(
-                                    (color) => GestureDetector(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Use horizontally scrollable row for small widths
+                        // and a two-row equally spaced grid for large tablets.
+                        if (constraints.maxWidth < 450) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  children: _colorPalette
+                                      .sublist(0, (_colorPalette.length / 2).toInt())
+                                      .map((color) {
+                                    return GestureDetector(
                                       onTap: () {
                                         setState(() {
                                           _selectedColor = color;
                                         });
                                       },
                                       child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
                                         decoration: BoxDecoration(
                                           color: color,
-                                          borderRadius:
-                                              BorderRadius.circular(2),
+                                          borderRadius: BorderRadius.circular(6),
                                           border: _selectedColor == color
-                                              ? Border.all(
-                                                  color: Colors.white, width: 1)
-                                              : null,
+                                              ? Border.all(color: Colors.white, width: 2)
+                                              : Border.all(color: Colors.black26, width: 1),
                                         ),
-                                        margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),
-                                        height: 15,
-                                        width: 15,
                                       ),
-                                    ),
-                                  )
-                                  ,
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              ..._colorPalette
-                                  .sublist((_colorPalette.length / 2).toInt())
-                                  .map(
-                                    (color) => GestureDetector(
+                                    );
+                                  }).toList(),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: _colorPalette
+                                      .sublist((_colorPalette.length / 2).toInt())
+                                      .map((color) {
+                                    return GestureDetector(
                                       onTap: () {
                                         setState(() {
                                           _selectedColor = color;
                                         });
                                       },
                                       child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
                                         decoration: BoxDecoration(
-                                          border: _selectedColor == color
-                                              ? Border.all(
-                                                  color: Colors.white, width: 1)
-                                              : null,
                                           color: color,
-                                          borderRadius:
-                                              BorderRadius.circular(2),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: _selectedColor == color
+                                              ? Border.all(color: Colors.white, width: 2)
+                                              : Border.all(color: Colors.black26, width: 1),
                                         ),
-                                        margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),
-                                        height: 15,
-                                        width: 15,
                                       ),
-                                    ),
-                                  )
-                                  ,
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          // Tablet layout: 2 rows with equal spacing, fit nicely in the width.
+                          // Using Expanded without AspectRatio to avoid unused horizontal space!
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: _colorPalette
+                                      .sublist(0, (_colorPalette.length / 2).toInt())
+                                      .map(
+                                        (color) => Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedColor = color;
+                                              });
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: color,
+                                                borderRadius: BorderRadius.circular(3),
+                                                border: _selectedColor == color
+                                                    ? Border.all(color: Colors.white, width: 1.5)
+                                                    : null,
+                                              ),
+                                              margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: _colorPalette
+                                      .sublist((_colorPalette.length / 2).toInt())
+                                      .map(
+                                        (color) => Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedColor = color;
+                                              });
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: color,
+                                                borderRadius: BorderRadius.circular(3),
+                                                border: _selectedColor == color
+                                                    ? Border.all(color: Colors.white, width: 1.5)
+                                                    : null,
+                                              ),
+                                              margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              )
                             ],
-                          )
-                        ],
-                      ),
+                          );
+                        }
+                      },
                     ),
                   ),
                 )
@@ -13166,8 +13277,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                           children: [
                             _AnimationVideo(
                               controller: _welldoneVideoController,
-                              width: 160.w,
-                              height: 160.h,
+                              size: 160.w,
                             ),
                             SizedBox(height: 14.h),
 
@@ -13241,8 +13351,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                           children: [
                             _AnimationVideo(
                               controller: _timeupVideoController,
-                              width: 160.w,
-                              height: 160.h,
+                              size: 160.w,
                             ),
                             SizedBox(height: 14.h),
                             Text(
@@ -13382,11 +13491,11 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             key: showcasekey6,
             child: Container(
               height: 50.h,
-              width: 120.w,
-              padding: EdgeInsets.symmetric(horizontal: 1.w),
+              width: 140.w, // Slightly wider to hold all 3 flex boxes properly
+              padding: EdgeInsets.symmetric(horizontal: 2.w),
               decoration: BoxDecoration(
-                color: const Color(0xFF111111),
-                borderRadius: BorderRadius.circular(8.r),
+                color: const Color(0xFF141414), // Mute outer layer color slightly lighter than deep black inside icons
+                borderRadius: BorderRadius.circular(10.r),
                 border: universalBorder,
               ),
               child: Row(
@@ -13420,12 +13529,11 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   //   },
                   // ),
                   _buildIconBox(
-                    child: Icon(_volumeIcon, size: 25.w, color: Colors.white70),
+                    child: Icon(_volumeIcon, size: 24.sp, color: Colors.white),
                     onTap: _toggleSlider,
                   ),
                   _buildIconBox(
-                    child: Icon(Icons.info_outline,
-                        size: 25.w, color: Colors.yellow),
+                    child: Icon(Icons.info_outline, size: 24.sp, color: const Color(0xFFFFC107)),
                     onTap: () async {
                       await Future.delayed(const Duration(milliseconds: 300));
                       if (!mounted) return;
@@ -13442,11 +13550,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                     },
                   ),
                   _buildIconBox(
-                    child: Image.asset(
-                      AppImages.reporticon,
-                      width: 25.w,
-                      height: 25.w,
-                    ),
+                    child: Icon(Icons.warning_rounded, size: 24.sp, color: const Color(0xFFD32F2F)),
                     onTap: () {
                       if (_room?.id == null) return;
                       int? drawerId;
@@ -13479,17 +13583,18 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   }
 
   Widget _buildIconBox({required Widget child, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: 27.w,
-        height: 35.h,
-        margin: EdgeInsets.symmetric(horizontal: 1.w, vertical: 1.h),
-        decoration: BoxDecoration(
-          color: const Color(0xFF000000),
-          borderRadius: BorderRadius.circular(6.r),
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          height: 48.h, // Fill out inner section vertically
+          margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFF000000), // Solid black background inside each button
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Center(child: child),
         ),
-        child: Center(child: child),
       ),
     );
   }
@@ -13521,58 +13626,45 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             },
       child: Container(
         height: 50.h,
-        padding: EdgeInsets.symmetric(horizontal: 14.w),
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(10.r),
           border: universalBorder,
         ),
-        child: Row(
-          children: [
-            Text(
-              AppLocalizations.messageLabel,
-              style: GoogleFonts.lato(
-                color: Colors.white60,
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(width: 10.w),
-            if (selectedOption != null)
-              Container(
-                width: 22.w,
-                height: 22.h,
-                decoration: BoxDecoration(
-                  color: selectedOption.accentColor.withOpacity(0.18),
-                  borderRadius: BorderRadius.circular(6.r),
-                  border: universalBorder,
-                ),
-                child: Center(
-                  child: Image.asset(
-                    selectedOption.iconPath,
-                    width: 16.w,
-                    height: 16.h,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            if (selectedOption != null) SizedBox(width: 8.w),
-            Expanded(
-              child: Text(
-                selectedOption?.label ?? 'Select',
-                overflow: TextOverflow.ellipsis,
+        alignment: Alignment.center,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.messageLabel,
                 style: GoogleFonts.lato(
-                  color: selectedOption?.accentColor ?? Colors.white38,
-                  fontSize: 13.sp,
+                  color: Colors.white60,
+                  fontSize: isTablet ? 20.0 : 14.sp,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-            // Arrow icon removed - not needed for message selector
-          ],
+              SizedBox(width: 8.w),
+              Text(
+                selectedOption?.label ?? '',
+                style: GoogleFonts.lato(
+                  color: selectedOption?.accentColor ?? Colors.white38,
+                  fontSize: isTablet ? 20.0 : 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  bool get isTablet {
+    if (!mounted) return false;
+    return MediaQuery.of(context).size.shortestSide >= 600;
   }
 
   Widget _buildChatArea() {
@@ -13617,7 +13709,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 12.h),
         color: const Color(0xFF000000),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Answers Chat (Left)
             _isAnswersChatExpanded
@@ -13640,16 +13732,15 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                               children: [
                                 Container(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w, vertical: 4.h),
+                                      horizontal: 16.w, vertical: 6.h),
                                   decoration: BoxDecoration(
                                       color: const Color(0xFF202020),
-                                      borderRadius: BorderRadius.circular(20.r),
-                                      border: universalBorder),
+                                      borderRadius: BorderRadius.circular(20.r)),
                                   child: Text(
                                     AppLocalizations.answersChat,
                                     style: GoogleFonts.inter(
                                       color: Colors.white70,
-                                      fontSize: 12.sp,
+                                      fontSize: isTablet ? 20.0 : 14.sp,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -13675,35 +13766,36 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                             child: Container(
                               padding: EdgeInsets.all(8.w),
                               child: _answersChatMessages.isEmpty
-                                  ? Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16.w),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 20.r,
-                                              backgroundColor: Colors.grey[800],
-                                              child: Icon(
-                                                Icons.person,
-                                                color: Colors.white70,
-                                                size: 20.sp,
+                                  ? Container(
+                                      padding: EdgeInsets.only(bottom: 8.h, left: 8.w, right: 8.w),
+                                      alignment: Alignment.bottomLeft,
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 20.r,
+                                            backgroundColor: Colors.grey[800],
+                                            child: Icon(
+                                              Icons.person,
+                                              color: Colors.white54,
+                                              size: 28.sp,
+                                            ),
+                                          ),
+                                          SizedBox(width: 12.w),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsets.only(bottom: 2.h),
+                                              child: Text(
+                                                AppLocalizations.answersChatInstruction,
+                                                style: GoogleFonts.lato(
+                                                  color: Colors.white60,
+                                                  fontSize: isTablet ? 20.0 : 14.sp,
+                                                  height: 1.2,
+                                                ),
                                               ),
                                             ),
-                                            SizedBox(height: 12.h),
-                                            Text(
-                                              AppLocalizations.answersChatInstruction,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 8.sp,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     )
                                   : ListView.builder(
@@ -13751,7 +13843,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                           userName[0]
                                                               .toUpperCase(),
                                                           style: TextStyle(
-                                                            fontSize: 12.sp,
+                                                            fontSize: isTablet ? 20.0 : 14.sp,
                                                             color: Colors.white,
                                                           ),
                                                         ),
@@ -13771,7 +13863,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                             : team == 'blue'
                                                                 ? Colors.blue
                                                                 : Colors.white,
-                                                        fontSize: 12.sp,
+                                                        fontSize: isTablet ? 20.0 : 14.sp,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                       ),
@@ -13785,7 +13877,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                         color: isCorrect
                                                             ? Colors.greenAccent
                                                             : Colors.white70,
-                                                        fontSize: 12.sp,
+                                                        fontSize: isTablet ? 20.0 : 14.sp,
                                                       ),
                                                     ),
                                                     if (isCorrect)
@@ -13832,13 +13924,13 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                       focusNode: _answerFocusNode,
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 14.sp,
+                                        fontSize: isTablet ? 20.0 : 14.sp,
                                       ),
                                       decoration: InputDecoration(
                                         hintText: AppLocalizations.typeAnswersHere,
                                         hintStyle: TextStyle(
                                           color: Colors.white38,
-                                          fontSize: 10.sp,
+                                          fontSize: isTablet ? 20.0 : 14.sp,
                                         ),
                                         filled: true,
                                         fillColor: Colors.transparent,
@@ -13927,7 +14019,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                           });
                       },
                       child: Container(
-                        width: 120.w,
+                        width: 140.w, // Match _buildControlsRow Container width exactly
                         margin: EdgeInsets.only(right: 8.w),
                         clipBehavior: Clip.hardEdge,
                         decoration: BoxDecoration(
@@ -13959,25 +14051,26 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(height: 5.h),
-                                Container(
-                                  // height: 30.h,
-                                  // width: 100.w,
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xFF202020),
-                                      borderRadius: BorderRadius.circular(20.r),
-                                      border: universalBorder),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 6.w, vertical: 3.h),
-                                  child: Center(
-                                    child: Text(
-                                      AppLocalizations.answersChat,
-                                      style: GoogleFonts.inter(
-                                        color: Colors.white70,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w700,
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16.w, vertical: 6.h),
+                                      decoration: BoxDecoration(
+                                          color: const Color(0xFF202020),
+                                          borderRadius: BorderRadius.circular(20.r),
+                                          border: universalBorder),
+                                      child: Text(
+                                        AppLocalizations.answersChat,
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white70,
+                                          fontSize: isTablet ? 20.0 : 14.sp,
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                                 // SizedBox(height: 8.h),
                                 // Show recent messages in collapsed view
@@ -14008,7 +14101,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     color: Colors.white70,
-                                                    fontSize: 8.sp,
+                                                    fontSize: isTablet ? 20.0 : 14.sp,
                                                   ),
                                                 ),
                                               ],
@@ -14062,7 +14155,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                                     .toUpperCase(),
                                                                 style: TextStyle(
                                                                     fontSize:
-                                                                        8.sp,
+                                                                        isTablet ? 20.0 : 14.sp,
                                                                     color: Colors
                                                                         .white))),
                                                   ),
@@ -14077,7 +14170,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                           userName,
                                                           style: TextStyle(
                                                             color: Colors.white,
-                                                            fontSize: 12.sp,
+                                                            fontSize: isTablet ? 20.0 : 14.sp,
                                                             fontWeight:
                                                                 FontWeight.w500,
                                                           ),
@@ -14095,7 +14188,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                                         .greenAccent
                                                                     : Colors
                                                                         .white70,
-                                                                fontSize: 8.sp,
+                                                                fontSize: isTablet ? 20.0 : 14.sp,
                                                               ),
                                                             ),
                                                             SizedBox(
@@ -14147,7 +14240,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                   'General Chat',
                                   style: TextStyle(
                                     color: Colors.white70,
-                                    fontSize: 14.sp,
+                                    fontSize: isTablet ? 20.0 : 14.sp,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -14195,7 +14288,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.white70,
-                                                fontSize: 12.sp,
+                                                fontSize: isTablet ? 20.0 : 14.sp,
                                               ),
                                             ),
                                           ],
@@ -14244,7 +14337,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                         userName[0]
                                                             .toUpperCase(),
                                                         style: TextStyle(
-                                                            fontSize: 12.sp,
+                                                            fontSize: isTablet ? 20.0 : 14.sp,
                                                             color:
                                                                 Colors.white),
                                                       ),
@@ -14264,7 +14357,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                           : team == 'blue'
                                                               ? Colors.blue
                                                               : Colors.white,
-                                                      fontSize: 12.sp,
+                                                      fontSize: isTablet ? 20.0 : 14.sp,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                     ),
@@ -14274,7 +14367,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                     message,
                                                     style: TextStyle(
                                                       color: Colors.white70,
-                                                      fontSize: 12.sp,
+                                                      fontSize: isTablet ? 20.0 : 14.sp,
                                                     ),
                                                   ),
                                                 ],
@@ -14305,13 +14398,13 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                     focusNode: _chatFocusNode,
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 14.sp,
+                                      fontSize: isTablet ? 20.0 : 14.sp,
                                     ),
                                     decoration: InputDecoration(
                                       hintText: AppLocalizations.typeAnything,
                                       hintStyle: TextStyle(
                                         color: Colors.white38,
-                                        fontSize: 14.sp,
+                                        fontSize: isTablet ? 20.0 : 14.sp,
                                       ),
                                       filled: true,
                                       fillColor: Colors.transparent,
@@ -14443,7 +14536,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                               textAlign: TextAlign.start,
                                               style: TextStyle(
                                                 color: Colors.white70,
-                                                fontSize: 12.sp,
+                                                fontSize: isTablet ? 20.0 : 14.sp,
                                               ),
                                             ),
                                           ),
@@ -14493,7 +14586,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                         userName[0]
                                                             .toUpperCase(),
                                                         style: TextStyle(
-                                                            fontSize: 8.sp,
+                                                            fontSize: isTablet ? 20.0 : 14.sp,
                                                             color:
                                                                 Colors.white))),
                                           ),
@@ -14507,7 +14600,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                   userName,
                                                   style: TextStyle(
                                                     color: Colors.white70,
-                                                    fontSize: 10.sp,
+                                                    fontSize: isTablet ? 20.0 : 14.sp,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -14519,7 +14612,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                                       TextOverflow.ellipsis,
                                                   style: TextStyle(
                                                     color: Colors.white70,
-                                                    fontSize: 10.sp,
+                                                    fontSize: isTablet ? 20.0 : 14.sp,
                                                   ),
                                                 ),
                                               ],
@@ -14592,7 +14685,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                           AppLocalizations.answersChat,
                           style: GoogleFonts.inter(
                             color: Colors.white70,
-                            fontSize: 14.sp,
+                            fontSize: isTablet ? 20.0 : 14.sp,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -14657,7 +14750,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                       : Text(
                                           userName[0].toUpperCase(),
                                           style: TextStyle(
-                                            fontSize: 12.sp,
+                                            fontSize: isTablet ? 20.0 : 14.sp,
                                             color: Colors.white,
                                           ),
                                         ),
@@ -14676,7 +14769,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                             : team == 'blue'
                                                 ? Colors.blue
                                                 : Colors.white,
-                                        fontSize: 12.sp,
+                                        fontSize: isTablet ? 20.0 : 14.sp,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -14687,7 +14780,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                         color: isCorrect
                                             ? Colors.greenAccent
                                             : Colors.white70,
-                                        fontSize: 12.sp,
+                                        fontSize: isTablet ? 20.0 : 14.sp,
                                       ),
                                     ),
                                     if (isCorrect)
@@ -14743,14 +14836,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                             // maxLines: 3,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 10.sp,
+                              fontSize: isTablet ? 20.0 : 14.sp,
                             ),
                             cursorColor: Colors.white.withOpacity(0.8),
                             decoration: InputDecoration(
                               hintText: AppLocalizations.typeAnything,
                               hintStyle: TextStyle(
                                 color: Colors.white38,
-                                fontSize: 12.sp,
+                                fontSize: isTablet ? 20.0 : 14.sp,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.r),
@@ -14850,7 +14943,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   'General Chat',
                   style: TextStyle(
                     color: Colors.white70,
-                    fontSize: 16.sp,
+                    fontSize: isTablet ? 20.0 : 14.sp,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -14906,7 +14999,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                                 ? Image.asset(avatar)
                                 : Text(userName[0].toUpperCase(),
                                     style: TextStyle(
-                                        fontSize: 8.sp, color: Colors.white))),
+                                        fontSize: isTablet ? 20.0 : 14.sp, color: Colors.white))),
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
@@ -14915,18 +15008,18 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                           children: [
                             Text(
                               userName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 14,
+                                fontSize: isTablet ? 20.0 : 14.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                             SizedBox(height: 6.h),
                             Text(
                               m['message'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 14,
+                                fontSize: isTablet ? 20.0 : 14.sp,
                               ),
                             ),
                           ],
@@ -14970,14 +15063,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                       maxLines: 1,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14.sp,
+                        fontSize: isTablet ? 20.0 : 14.sp,
                       ),
                       cursorColor: Colors.white.withOpacity(0.8),
                       decoration: InputDecoration(
                         hintText: AppLocalizations.typeAnything,
                         hintStyle: TextStyle(
                           color: Colors.white38,
-                          fontSize: 12.sp,
+                          fontSize: isTablet ? 20.0 : 14.sp,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.r),
@@ -15019,13 +15112,12 @@ class _GameRoomScreenState extends State<GameRoomScreen>
 // Helper widget for playing animation videos
 class _AnimationVideo extends StatefulWidget {
   final VideoPlayerController? controller;
-  final double width;
-  final double height;
+  final double size;
 
   const _AnimationVideo({
+    super.key,
     required this.controller,
-    required this.width,
-    required this.height,
+    required this.size,
   });
 
   @override
@@ -15084,24 +15176,25 @@ class _AnimationVideoState extends State<_AnimationVideo> {
     if (widget.controller == null || !widget.controller!.value.isInitialized) {
       
       return SizedBox(
-        width: widget.width,
-        height: widget.height,
+        width: widget.size,
+        height: widget.size,
         child: const Center(
           child: CircularProgressIndicator(color: Colors.white),
         ),
       );
     }
 
-    
     return SizedBox(
-      width: widget.width,
-      height: widget.height,
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: SizedBox(
-          width: widget.controller!.value.size.width,
-          height: widget.controller!.value.size.height,
-          child: VideoPlayer(widget.controller!),
+      width: widget.size,
+      height: widget.size,
+      child: ClipOval(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: widget.controller!.value.size.width,
+            height: widget.controller!.value.size.height,
+            child: VideoPlayer(widget.controller!),
+          ),
         ),
       ),
     );
@@ -15240,4 +15333,57 @@ Widget teamBadge({
   );
 
   return GestureDetector(onTap: onTap, child: circle);
+}
+
+class AnimatedPulsingDot extends StatefulWidget {
+  final Color color;
+  final double baseSize;
+  const AnimatedPulsingDot({Key? key, this.color = Colors.white, this.baseSize = 12.0}) : super(key: key);
+
+  @override
+  _AnimatedPulsingDotState createState() => _AnimatedPulsingDotState();
+}
+
+class _AnimatedPulsingDotState extends State<AnimatedPulsingDot> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+    
+    _animation = Tween<double>(begin: 0.8, end: 1.4).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _animation.value,
+          child: Container(
+            width: widget.baseSize,
+            height: widget.baseSize,
+            decoration: BoxDecoration(
+              color: widget.color,
+              shape: BoxShape.circle,
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
