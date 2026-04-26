@@ -8,6 +8,7 @@ import 'package:dotlottie_flutter/dotlottie_flutter.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:inkbattle_frontend/config/environment.dart';
 import 'package:inkbattle_frontend/utils/preferences/local_preferences.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class DailyCoinsPopup extends StatefulWidget {
   final Function(dynamic)? onClaimed;
@@ -144,131 +145,273 @@ class _DailyCoinsPopupState extends State<DailyCoinsPopup> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final isTablet = MediaQuery.of(context).size.width > 600;
+  // Widget build(BuildContext context) {
+  //   final isTablet = MediaQuery.of(context).size.width > 600;
 
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+  //   if (_isLoading) {
+  //     return const Center(child: CircularProgressIndicator());
+  //   }
 
-    return Center(
-      child: FractionallySizedBox(
-        heightFactor: _dialogHeightFactor(context),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: _dialogWidth(context),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF1C1C30),
-                  Color(0xFF0E0E1A),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              borderRadius: BorderRadius.circular(22.r),
-              border: Border.all(
-                color: Colors.blueAccent,
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blueAccent.withOpacity(0.3),
-                  blurRadius: 12,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20.w,
-                vertical: 18.h,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+  //   return Center(
+  //     child: FractionallySizedBox(
+  //       heightFactor: _dialogHeightFactor(context),
+  //       child: ConstrainedBox(
+  //         constraints: BoxConstraints(
+  //           maxWidth: _dialogWidth(context),
+  //         ),
+  //         child: Container(
+  //           decoration: BoxDecoration(
+  //             gradient: const LinearGradient(
+  //               colors: [
+  //                 Color(0xFF1C1C30),
+  //                 Color(0xFF0E0E1A),
+  //               ],
+  //               begin: Alignment.topCenter,
+  //               end: Alignment.bottomCenter,
+  //             ),
+  //             borderRadius: BorderRadius.circular(22.r),
+  //             border: Border.all(
+  //               color: Colors.blueAccent,
+  //               width: 1.5,
+  //             ),
+  //             boxShadow: [
+  //               BoxShadow(
+  //                 color: Colors.blueAccent.withOpacity(0.3),
+  //                 blurRadius: 12,
+  //                 spreadRadius: 1,
+  //               ),
+  //             ],
+  //           ),
+  //           child: Padding(
+  //             padding: EdgeInsets.symmetric(
+  //               horizontal: 20.w,
+  //               vertical: 18.h,
+  //             ),
+  //             child: Column(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
 
-                  // LOTTIE
-                  SizedBox(
-                    height: _animationHeight(context),
-                    child: DotLottieView(
-                      sourceType: 'url',
-                      source: _lottieUrl,
-                      autoplay: true,
-                      loop: true,
-                    ),
-                  ),
+  //                 // LOTTIE
+  //                 SizedBox(
+  //                   height: _animationHeight(context),
+  //                   child: DotLottieView(
+  //                     sourceType: 'url',
+  //                     source: _lottieUrl,
+  //                     autoplay: true,
+  //                     loop: true,
+  //                   ),
+  //                 ),
 
-                  SizedBox(height: 16.h),
+  //                 SizedBox(height: 16.h),
 
-                  // TEXT
-                  if (_claimed) ...[
-                    _title("YOU GOT", Colors.blue, isTablet),
-                    _title("$_coinsToAward COINS!", Colors.yellow, isTablet),
-                  ] else if (_canClaim) ...[
-                    _title("DAILY BONUS", Colors.blue, isTablet),
-                    _title("1000 COINS!", Colors.yellow, isTablet),
-                  ] else ...[
-                    _title("COME BACK IN", Colors.blue, isTablet),
-                    _title("$_hoursRemaining HOURS", Colors.orange, isTablet),
-                  ],
+  //                 // TEXT
+  //                 if (_claimed) ...[
+  //                   _title("YOU GOT", Colors.blue, isTablet),
+  //                   _title("$_coinsToAward COINS!", Colors.yellow, isTablet),
+  //                 ] else if (_canClaim) ...[
+  //                   _title("DAILY BONUS", Colors.blue, isTablet),
+  //                   _title("1000 COINS!", Colors.yellow, isTablet),
+  //                 ] else ...[
+  //                   _title("COME BACK IN", Colors.blue, isTablet),
+  //                   _title("$_hoursRemaining HOURS", Colors.orange, isTablet),
+  //                 ],
 
-                  SizedBox(height: 22.h),
+  //                 SizedBox(height: 22.h),
 
-                  // BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    height: isTablet ? 60.h : 52.h,
-                    child: ElevatedButton(
-                      onPressed: _claimed
-                          ? () => Navigator.pop(context)
-                          : (_canClaim
-                              ? _claimDailyBonus
-                              : () => Navigator.pop(context)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff2a6bff),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28.r),
-                        ),
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          _claimed
-                              ? "AWESOME!"
-                              : (_canClaim ? "CLAIM NOW!" : "OK"),
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+  //                 // BUTTON
+  //                 SizedBox(
+  //                   width: double.infinity,
+  //                   height: isTablet ? 60.h : 52.h,
+  //                   child: ElevatedButton(
+  //                     onPressed: _claimed
+  //                         ? () => Navigator.pop(context)
+  //                         : (_canClaim
+  //                             ? _claimDailyBonus
+  //                             : () => Navigator.pop(context)),
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: const Color(0xff2a6bff),
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(28.r),
+  //                       ),
+  //                     ),
+  //                     child: FittedBox(
+  //                       fit: BoxFit.scaleDown,
+  //                       child: Text(
+  //                         _claimed
+  //                             ? "AWESOME!"
+  //                             : (_canClaim ? "CLAIM NOW!" : "OK"),
+  //                         maxLines: 1,
+  //                         style: TextStyle(
+  //                           color: Colors.white,
+  //                           fontSize: 20.sp,
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  @override
+Widget build(BuildContext context) {
+  final size = MediaQuery.of(context).size;
+  final isTablet = size.width >= 600;
+
+  if (_isLoading) {
+    return const Center(child: CircularProgressIndicator());
   }
 
+  return Center(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: isTablet ? 460 : size.width * 0.9,
+      ),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isTablet ? 28 : 20,
+          vertical: isTablet ? 28 : 22,
+        ),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1C1C30),
+              Color(0xFF0E0E1A),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(
+            color: const Color(0xFF2A6BFF),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2A6BFF).withOpacity(0.6),
+              blurRadius: 28,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            /// 🎁 Animation
+            SizedBox(
+              height: isTablet ? 200 : 150,
+              child: DotLottieView(
+                sourceType: 'url',
+                source: _lottieUrl,
+                autoplay: true,
+                loop: true,
+              ),
+            ),
+
+            SizedBox(height: isTablet ? 20 : 16),
+
+            /// 🏆 Titles
+            if (_claimed) ...[
+              _title("YOU GOT", const Color(0xFF3AA0FF), isTablet),
+              _title("$_coinsToAward COINS!", const Color(0xFFFFE44D), isTablet),
+            ] else if (_canClaim) ...[
+              _title("DAILY BONUS", const Color(0xFF3AA0FF), isTablet),
+              _title("${Environment.dailyCoinsAwarded} COINS!",
+                  const Color(0xFFFFE44D), isTablet),
+            ] else ...[
+              _title("COME BACK IN", const Color(0xFF3AA0FF), isTablet),
+              _title("$_hoursRemaining HOURS",
+                  const Color(0xFFFFA726), isTablet),
+            ],
+
+            SizedBox(height: isTablet ? 28 : 22),
+
+            /// 🚀 Button With Depth
+            Container(
+              width: double.infinity,
+              height: isTablet ? 62 : 54,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF2A6BFF).withOpacity(0.5),
+                    blurRadius: 20,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed: _claimed
+                    ? () => Navigator.pop(context)
+                    : (_canClaim
+                        ? _claimDailyBonus
+                        : () => Navigator.pop(context)),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: const Color(0xFF2A6BFF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                ),
+                child: Text(
+                  _claimed
+                      ? AppLocalizations.awesome
+                      : (_canClaim ? AppLocalizations.claimNow : AppLocalizations.ok),
+                  style: GoogleFonts.luckiestGuy(
+                    fontSize: isTablet ? 24 : 20,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+
+  // Widget _title(String text, Color color, bool isTablet) {
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(vertical: 4.h),
+  //     child: Text(
+  //       text,
+  //       textAlign: TextAlign.center,
+  //       style: GoogleFonts.luckiestGuy(
+  //         fontSize: isTablet ? 24.sp : 20.sp,
+  //         color: color,
+  //       ),
+  //     ),
+  //   );
+  // }
   Widget _title(String text, Color color, bool isTablet) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4.h),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Text(
         text,
         textAlign: TextAlign.center,
         style: GoogleFonts.luckiestGuy(
-          fontSize: isTablet ? 24.sp : 20.sp,
+          fontSize: isTablet ? 28 : 22,
           color: color,
+          letterSpacing: 1.2,
+          shadows: [
+            Shadow(
+              color: color.withOpacity(0.6),
+              blurRadius: 12,
+            ),
+          ],
         ),
       ),
     );
   }
+
 }

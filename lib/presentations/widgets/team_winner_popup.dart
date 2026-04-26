@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/presentations/widgets/winner.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class TeamWinnerPopup extends StatelessWidget {
   final List<Team> teams;
@@ -46,7 +47,7 @@ class TeamWinnerPopup extends StatelessWidget {
 
               /// TITLE
               Text(
-                'Team Winners!',
+                AppLocalizations.teamWinners,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
                   color: Colors.white,
@@ -91,7 +92,7 @@ class TeamWinnerPopup extends StatelessWidget {
                             ),
 
                             Text(
-                              'Score: ${team.score}',
+                              '${AppLocalizations.score}${team.score}',
                               style: GoogleFonts.lato(
                                 color: Colors.amber,
                                 fontSize:
@@ -123,7 +124,7 @@ class TeamWinnerPopup extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Close',
+                  AppLocalizations.close,
                   style: GoogleFonts.lato(
                     color: Colors.white,
                     fontSize: isTablet ? 20.sp : 18.sp,

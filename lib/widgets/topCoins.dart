@@ -9,46 +9,57 @@ class CoinContainer extends StatelessWidget {
   const CoinContainer({super.key, this.coins = 0});
 
   @override
+  @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.shortestSide > 600;
+
+    final containerHeight = isTablet ? 42.h : 36.h;
+    final containerWidth = isTablet ? 120.w : 105.w;
+    final coinSize = isTablet ? 48.h : 40.h;
 
     return Row(
       children: [
         const Spacer(),
         Stack(
           clipBehavior: Clip.none,
+          alignment: Alignment.centerLeft,
           children: [
+            // Rectangle
             Container(
-              width: 125.w,
-              height: isTablet ? 50.h : 40.h,
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+              width: containerWidth,
+              height: containerHeight,
+              padding: EdgeInsets.only(
+                right: 16.w,
+                left: coinSize * 0.55, // important for correct spacing
+              ),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(50.r), // fully rounded
                 border: Border.all(
                   color: const Color.fromRGBO(0, 133, 182, 1),
                   width: 2.w,
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    coins.toString(),
-                    style: GoogleFonts.poppins(
-                      fontSize: 18.sp,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+              alignment: Alignment.centerRight,
+              child: Text(
+                coins.toString(),
+                style: GoogleFonts.poppins(
+                  fontSize: isTablet ? 18.sp : 16.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
             ),
+
+            // Coin
             Positioned(
-              left: -20.w,
-              top: -2.h,
-              child: Image.asset(
-                AppImages.coin,
-                height: isTablet ? 50.h : 45.h,
-                width: isTablet ? 50.h : 45.w,
+              left: -coinSize * 0.35, // perfect overlap
+              child: SizedBox(
+                height: coinSize,
+                width: coinSize,
+                child: Image.asset(
+                  AppImages.coin,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ],
@@ -56,4 +67,5 @@ class CoinContainer extends StatelessWidget {
       ],
     );
   }
+
 }

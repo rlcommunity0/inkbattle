@@ -5,6 +5,7 @@ import 'package:inkbattle_frontend/constants/app_colors.dart';
 import 'package:inkbattle_frontend/utils/preferences/local_preferences.dart';
 import 'package:inkbattle_frontend/widgets/text_widget.dart';
 import 'package:inkbattle_frontend/widgets/topCoins.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class VideoRewardDialog extends StatefulWidget {
   final int coinsAwarded;
@@ -111,14 +112,24 @@ class _VideoRewardDialogState extends State<VideoRewardDialog>
             child: _isVideoInitialized &&
                 _videoController != null &&
                 _videoController!.value.isInitialized
-                ? FittedBox(
-                  fit: BoxFit.cover,
-                  child: SizedBox(
-                    width: _videoController!.value.size.width,
-                    height: _videoController!.value.size.height,
-                    child: VideoPlayer(_videoController!),
-                  ),
-                )
+                ? ClipOval(
+                    child: Container(
+                      width: 340.w,
+                      height: 340.w,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black,
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          width: _videoController!.value.size.width,
+                          height: _videoController!.value.size.height,
+                          child: VideoPlayer(_videoController!),
+                        ),
+                      ),
+                    ),
+                  )
                 : const CircularProgressIndicator(color: Colors.white),
           ),
           // Overlay content
@@ -157,7 +168,7 @@ class _VideoRewardDialogState extends State<VideoRewardDialog>
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text("Skip ",
+                          Text(AppLocalizations.skipButton,
                               style: TextStyle(
                                   color: Colors.white70, fontSize: 14.sp)),
                           Icon(Icons.arrow_forward_ios,

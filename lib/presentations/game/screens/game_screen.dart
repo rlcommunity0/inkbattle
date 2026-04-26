@@ -10,6 +10,7 @@ import 'package:inkbattle_frontend/presentations/widgets/exit.dart';
 import 'package:inkbattle_frontend/presentations/widgets/report.dart';
 import 'package:inkbattle_frontend/presentations/widgets/teamsview.dart';
 import 'package:inkbattle_frontend/presentations/widgets/winner.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class Player {
   final String id;
@@ -681,7 +682,7 @@ class _GameScreenState extends State<GameScreen> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Message :',
+                  'Message ', 
                   style: GoogleFonts.lato(
                     color: Colors.white38,
                     fontSize: 15.sp,
@@ -746,7 +747,7 @@ class _GameScreenState extends State<GameScreen> {
                     padding:
                         EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
                     child: Text(
-                      'Answers chat',
+                      AppLocalizations.answersChat,
                       style: GoogleFonts.inter(
                           color: Colors.white70,
                           fontSize: 12.sp,

@@ -98,7 +98,7 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Purchase failed: $error'),
+          content: Text('${AppLocalizations.purchaseFailed}$error'),
           backgroundColor: Colors.red,
         ),
       );
@@ -118,7 +118,7 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Purchase successful but failed to add coins: ${failure.message}'),
+                content: Text('${AppLocalizations.purchaseSuccessfulButFailedToAddCoins}${failure.message}'),
                 backgroundColor: Colors.orange,
               ),
             );
@@ -154,7 +154,7 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error processing purchase: $e'),
+            content: Text('${AppLocalizations.errorProcessingPurchase}$e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -271,8 +271,8 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
     if (_isProcessingPayment) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Purchase already in progress. Please wait...'),
+          SnackBar(
+            content: Text(AppLocalizations.purchaseAlreadyInProgress),
             backgroundColor: Colors.orange,
           ),
         );
@@ -284,8 +284,8 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
     if (!Platform.isAndroid && !Platform.isIOS) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('In-app purchases are only supported on Android and iOS devices.'),
+          SnackBar(
+            content: Text(AppLocalizations.inAppPurchasesOnlySupported),
             backgroundColor: Colors.red,
           ),
         );
@@ -305,7 +305,7 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
           final platformName = Platform.isAndroid ? 'Google Play' : 'App Store';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('In-app purchases are not available. Please ensure you are signed in to $platformName.'),
+              content: Text('${AppLocalizations.inAppPurchasesNotAvailable}$platformName.'),
               backgroundColor: Colors.red,
             ),
           );
@@ -332,7 +332,7 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
         final platformName = Platform.isAndroid ? 'Google Play' : 'App Store';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to initiate purchase. Please try again or contact support if the issue persists. ($platformName)'),
+            content: Text('${AppLocalizations.failedToInitiatePurchase}$platformName)'),
             backgroundColor: Colors.red,
           ),
         );

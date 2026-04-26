@@ -5,6 +5,7 @@ import 'package:inkbattle_frontend/constants/app_images.dart';
 import 'package:inkbattle_frontend/models/room_model.dart';
 import 'package:inkbattle_frontend/presentations/game/widgets/form.dart';
 import 'package:inkbattle_frontend/presentations/game/widgets/submitted.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class ErrorPopup extends StatelessWidget {
   ErrorPopup({super.key, required this.participants, required this.roomId});
@@ -45,8 +46,8 @@ class ErrorPopup extends StatelessWidget {
             children: [
               Image.asset(
                 AppImages.reportlogo,
-                width: 40.w,
-                height: 40.w,
+                width: isTablet ? 65.w : 40.w,
+                height: isTablet ? 65.w : 40.w,
               ),
             ],
           ),
@@ -61,7 +62,7 @@ class ErrorPopup extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            'Help us keep the game fun and safe',
+            AppLocalizations.helpKeepGameFunAndSafe,
             textAlign: TextAlign.center,
             style: GoogleFonts.lato(
                 color: const Color(0xFF979595),
@@ -73,8 +74,8 @@ class ErrorPopup extends StatelessWidget {
             children: [
               _buildOptionButton(
                 context,
-                title: 'Report Member',
-                subtitle: 'Report inappropriate chat, name, or behavior',
+                title: AppLocalizations.reportMember,
+                subtitle: AppLocalizations.reportInappropriateChat,
                 imagePath: AppImages.reportmember,
                 onPressed: () {
                   Navigator.pop(context);
@@ -90,9 +91,9 @@ class ErrorPopup extends StatelessWidget {
               SizedBox(height: 20.h),
               _buildOptionButton(
                 context,
-                title: 'Report Drawing',
+                title: AppLocalizations.reportDrawing,
                 subtitle:
-                    'Report if someone draws answers or offensive content',
+                    AppLocalizations.reportDrawingDescription,
                 imagePath: AppImages.reportdrawing,
                 onPressed: () {
                   Navigator.pop(context);

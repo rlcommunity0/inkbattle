@@ -35,7 +35,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
   // String? selectedCategory;
   List<String> selectedCategories = [];
   bool voiceEnabled = false;
-  String? selectedGameMode = "team_vs_team";
+  String? selectedGameMode;
   bool _isLoading = false;
   
   // REMOVED: Ad variables
@@ -53,8 +53,6 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
   @override
   void initState() {
     super.initState();
-    selectedScript = scripts.first;
-    selectedPoints = points.first;
     // Load languages/categories first, then load rooms (so allFilled is true when we fetch)
     _loadLanguagesAndCategories();
     // REMOVED: _loadBannerAd();
@@ -112,11 +110,11 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
     if (mounted) {
       setState(() {
         languages = langList;
-        selectedLanguage = lang;
+        selectedLanguage = null;
         categories = catList;
-        selectedCategories = catList.isNotEmpty ? List.from(catList) : [];
+        selectedCategories = [];
       });
-      // Now allFilled is true (selectedCategories.isNotEmpty); fetch rooms
+      // Now allFilled is false; user must select fields to fetch rooms
       _loadRooms();
     }
   }
@@ -510,7 +508,9 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
                           icon: Icons.people,
                           value: selectedGameMode == "team_vs_team"
                               ? AppLocalizations.team
-                              : AppLocalizations.individual,
+                              : selectedGameMode == "1v1"
+                                  ? AppLocalizations.individual
+                                  : null,
                           onChanged: (val) {
                             if (val == AppLocalizations.team) {
                               setState(() {
@@ -653,6 +653,8 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
     final bool isDropdown =
         !isStatic && !isToggle; // True if it should open a menu
 
+    final bool isFilled = value != null;
+
     // Increased height and padding for tablet
     return Container(
       height: isTablet ? 65.0 : 45.h, // Increased height for larger font
@@ -660,7 +662,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
         borderRadius: BorderRadius.circular(25.r),
         // Use a subtle gradient/border for styling
         border: Border.all(color: Colors.white, width: isTablet ? 2.0 : 1.w),
-        color: const Color(0xFF0E0E0E),
+        color: isFilled ? Colors.black.withOpacity(0.35) : Colors.transparent,
       ),
       child: Material(
         color: Colors.transparent,
@@ -718,7 +720,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
                     softWrap: false,
                     textAlign: TextAlign.left,
                     style: GoogleFonts.lato(
-                      color: Colors.white,
+                      color: isFilled ? Colors.white : Colors.white54,
                       fontSize: isTablet ? 22.0 : 13.sp, // Increased font size
                       fontWeight: FontWeight.w600,
                       height: 1.2,
@@ -760,7 +762,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25.r),
         border: Border.all(color: Colors.white, width: isTablet ? 2.0 : 1.w),
-        color: const Color(0xFF0E0E0E),
+        color: selectedValues.isNotEmpty ? Colors.black.withOpacity(0.35) : Colors.transparent,
       ),
       child: Material(
         color: Colors.transparent,
@@ -857,7 +859,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedLanguage = val);
           _loadRooms();
         },
-        hintText: "Language",
+        hintText: AppLocalizations.language,
         iconColor: Colors.lightBlueAccent,
       );
 
@@ -869,7 +871,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedScript = val);
           _loadRooms();
         },
-        hintText: "Script",
+        hintText: AppLocalizations.script,
         iconColor: Colors.deepPurpleAccent,
       );
 
@@ -881,7 +883,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedPoints = val);
           _loadRooms();
         },
-        hintText: "Points",
+        hintText: AppLocalizations.points,
         iconColor: Colors.amber,
       );
 
@@ -893,7 +895,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           setState(() => selectedCountry = val);
           _loadRooms();
         },
-        hintText: "Country",
+        hintText: AppLocalizations.country,
         iconColor: Colors.lightGreenAccent,
       );
 
@@ -907,7 +909,7 @@ class _MultiplayerScreenState extends State<MultiplayerScreen> {
           });
           _loadRooms();
         },
-        hintText: "Category",
+        hintText: AppLocalizations.category,
         iconColor: Colors.orange,
       );
 

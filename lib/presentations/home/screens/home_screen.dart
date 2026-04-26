@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:inkbattle_frontend/presentations/home/widgets/adsFree.dart';
 import 'package:inkbattle_frontend/presentations/home/widgets/button.dart';
@@ -12,6 +13,7 @@ import 'package:inkbattle_frontend/widgets/custom_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:inkbattle_frontend/repositories/user_repository.dart';
 import 'package:inkbattle_frontend/models/user_model.dart';
+import 'package:inkbattle_frontend/utils/preferences/local_preferences.dart';
 import 'package:inkbattle_frontend/services/ad_service.dart';
 import 'package:inkbattle_frontend/utils/lang.dart';
 import 'package:inkbattle_frontend/widgets/persistent_banner_ad_widget.dart';
@@ -28,12 +30,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   static const String _logTag = 'HomeScreen';
+  static Future<bool>? _pendingEnsureGuest;
   final UserRepository _userRepository = UserRepository();
   UserModel? _currentUser;
   bool _isLoading = true;
   bool _hasInitialized = false;
   DateTime? _lastRefreshTime;
   int _headerKey = 0; // Key to force header rebuild
+  bool _canClaimDailyCoins = false;
 
   @override
   void initState() {
@@ -86,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 _currentUser = localUser;
                 _headerKey++; // Force header rebuild again with new data
               });
+              _checkDailyBonusEligibility();
             }
             _loadUserData();
           });
@@ -97,6 +102,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Future<void> _loadUserData({bool forceRefresh = false}) async {
     try {
+      // Lazy guest: ensure guest on server once (only Home calls this; guard avoids duplicate requests)
+      if (LocalStorageUtils.hasPendingGuest()) {
+        _pendingEnsureGuest ??= _userRepository.ensureGuest();
+        await _pendingEnsureGuest;
+        _pendingEnsureGuest = null; // allow next session to ensure again if needed
+      }
+
       // First, always try to load from local storage for immediate update
       final localUser = await _userRepository.getUserLocally();
       if (localUser != null && mounted) {
@@ -127,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 _currentUser = user;
                 _isLoading = false;
               });
+              _checkDailyBonusEligibility();
             }
           },
         );
@@ -152,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 _currentUser = user;
                 _isLoading = false;
               });
+              _checkDailyBonusEligibility();
             }
           },
         );
@@ -168,6 +182,119 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         });
       }
     }
+  }
+
+  Future<void> _checkDailyBonusEligibility() async {
+    if (!mounted) return;
+    final result = await _userRepository.getDailyBonusStatus();
+    result.fold(
+      (_) {},
+      (data) {
+        if (mounted) {
+          setState(() {
+            _canClaimDailyCoins = data['canClaim'] ?? false;
+          });
+        }
+      },
+    );
+  }
+
+  Widget _buildCircleButton({
+    required Widget child,
+    required VoidCallback onTap,
+    bool showNotification = false,
+    required bool isTablet,
+    required double size,
+  }) {
+    // Slightly larger circle so coinsss image appears a bit bigger (Figma)
+    final buttonSize = isTablet ? size * 0.40 : size * 0.36;
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        splashColor: Colors.white24,
+        highlightColor: Colors.white10,
+        child: SizedBox(
+          width: buttonSize,
+          height: buttonSize,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              // Background image first, then text overlays (Figma order)
+              Container(
+                width: buttonSize,
+                height: buttonSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: const AssetImage(AppImages.coinsss),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              child,
+              // Red notification at top-right, slightly overlapping (Figma)
+              /* if (showNotification)
+                Positioned(
+                  top: isTablet ? -10 : -6,
+                  right: isTablet ? -10 : -6,
+                  child: Container(
+                    width: isTablet ? 14.r : 10.r,
+                    height: isTablet ? 14.r : 10.r,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.redAccent.withOpacity(0.7),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ), */
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Same font and style as Play Random / Multiplayer / Friends (CustomRoomButton).
+  Widget _buildCircleButtonText(String text, bool isTablet) {
+    final double textSize = isTablet ? 8.sp : 13.sp;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.luckiestGuy(
+            fontSize: textSize,
+            fontWeight: FontWeight.w400,
+            height: 1.15,
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 2
+              ..color = Colors.black,
+          ),
+        ),
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.luckiestGuy(
+            fontSize: textSize,
+            fontWeight: FontWeight.w400,
+            height: 1.15,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -194,6 +321,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   _currentUser = localUser;
                   _headerKey++; // Force header rebuild again with new data
                 });
+                _checkDailyBonusEligibility();
               }
               // Then refresh from server
               if (!_isLoading) {
@@ -255,144 +383,137 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 child: LayoutBuilder(
                                   builder: (context, constraints) {
                                     // Base calculation on width, but FittedBox will override if height is tight
-                                    double circleSize = isTablet ? 0.45.sw : 0.7.sw;
+                                    double circleSize = isTablet ? 0.47.sw : 0.8.sw;
                                     circleSize = circleSize.clamp(
                                         isTablet ? 320 : 200, isTablet ? 500 : 400);
 
-                                    // Keep your existing Stack/Logo code exactly as is
+                                    // Math for button placement on edge of circle (match _buildCircleButton size)
+                                    double radius = circleSize / 2;
+                                    double buttonSize = isTablet ? circleSize * 0.36 : circleSize * 0.34;
+                                    double buttonRadius = buttonSize / 2;
+
+                                    // Top left (Get Daily Coins) at 135 degrees (from 3 o'clock, CCW)
+                                    double leftTL = radius + radius * (-0.7071) - buttonRadius;
+                                    double topTL = radius + radius * (-0.7071) - buttonRadius;
+
+                                    // Bottom right (Ads Free) at 25 degrees (from 3 o'clock, CW is down)
+                                    double leftBR = radius + radius * 0.9063 - buttonRadius;
+                                    double topBR = radius + radius * 0.4226 - buttonRadius;
+
                                     return Stack(
+                                      clipBehavior: Clip.none,
                                       alignment: Alignment.center,
                                       children: [
                                         Container(
-                                          width: circleSize,
-                                          height: circleSize,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            // 1. VIBRANT GRADIENT (The "Border" Color)
-                                            gradient: const LinearGradient(
-                                              colors: [
-                                                Colors.cyanAccent,
-                                                Colors.purpleAccent,
-                                                Colors.blueAccent,
-                                                Colors.cyanAccent,
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
-                                            // 2. GLOW EFFECT
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.cyanAccent.withOpacity(0.4),
-                                                blurRadius: 10,
-                                                spreadRadius: 2,
+                                            width: circleSize,
+                                            height: circleSize,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: const Color(0xFF002547), // Inner dark blue background
+                                              border: Border.all(
+                                                color: const Color(0xFF00E5FF), // Neon cyan border
+                                                width: isTablet ? 4.w : 3.w,
                                               ),
-                                            ],
-                                          ),
-                                          // 3. BORDER WIDTH (Controlled by padding)
-                                          child: Padding(
-                                            padding: EdgeInsets.all(isTablet ? 4.w : 3.w), 
-                                            child: Container(
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                // 4. INNER BACKGROUND 
-                                                // (Necessary to "cut out" the center of the gradient)
-                                                color: Colors.black, // Or use Color(0xFF002547) to match your app theme
-                                              ),
-                                              child: Center(
-                                                child: Image.asset(
-                                                  AppImages.homelogoPng,
-                                                  width: circleSize * 0.80,
-                                                  height: circleSize * 0.80,
-                                                  fit: BoxFit.contain,
+                                              boxShadow: [
+                                                // Strong outer glow
+                                                BoxShadow(
+                                                  color: const Color(0xFF00E5FF).withOpacity(0.6),
+                                                  blurRadius: 30,
+                                                  spreadRadius: 6,
                                                 ),
+                                                // Soft ambient glow
+                                                BoxShadow(
+                                                  color: const Color(0xFF00E5FF).withOpacity(0.3),
+                                                  blurRadius: 15,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Center(
+                                              child: Image.asset(
+                                                AppImages.homelogoPng,
+                                                width: circleSize * 0.75,
+                                                height: circleSize * 0.75,
+                                                fit: BoxFit.contain,
                                               ),
                                             ),
                                           ),
-                                        ),
                                         // Daily Coins Button
                                         Positioned(
-                                          left: circleSize * 0.01,
-                                          top: circleSize * 0.01,
-                                          child: Material(
-                                            color: Colors.transparent,
-                                            shape: const CircleBorder(),
-                                            child: InkWell(
-                                              onTap: () async {
-                                                await showDialog(
-                                                  context: context,
-                                                  barrierDismissible: true,
-                                                  barrierColor:
-                                                      Colors.black.withOpacity(0.8),
-                                                  builder: (_) => DailyCoinsPopup(
-                                                    onClaimed: (coins) {
-                                                      _loadUserData();
-                                                    },
-                                                  ),
-                                                );
-                                              },
-                                              customBorder: const CircleBorder(),
-                                              splashColor: Colors.white24,
-                                              highlightColor: Colors.white10,
-                                              child: SizedBox(
-                                                width: isTablet
-                                                    ? circleSize * 0.32
-                                                    : circleSize * 0.3,
-                                                height: isTablet
-                                                    ? circleSize * 0.32
-                                                    : circleSize * 0.3,
-                                                child: Image.asset(
-                                                  AppImages.dailycoins,
-                                                  fit: BoxFit.contain,
+                                          left: leftTL,
+                                          top: topTL,
+                                          child: _buildCircleButton(
+                                            isTablet: isTablet,
+                                            size: circleSize,
+                                            showNotification: _canClaimDailyCoins,
+                                            onTap: () async {
+                                              await showDialog(
+                                                context: context,
+                                                barrierDismissible: true,
+                                                barrierColor:
+                                                    Colors.black.withOpacity(0.8),
+                                                builder: (_) => DailyCoinsPopup(
+                                                  onClaimed: (_) {
+                                                    _loadUserData();
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 4.w,
+                                                vertical: 3.h,
+                                              ),
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: _buildCircleButtonText(
+                                                  'GET\nDAILY\nCOINS',
+                                                  isTablet,
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                        // AdsFree Button
+                                        // Ads Free Button
                                         Positioned(
-                                          right: circleSize * 0.01,
-                                          bottom: circleSize * 0.01,
-                                          child: Material(
-                                            color: Colors.transparent,
-                                            shape: const CircleBorder(),
-                                            child: InkWell(
-                                              onTap: () {
-                                                AdsFreePopup.show(
-                                                  context,
-                                                  onAdWatched: (coins) {
-                                                    VideoRewardDialog.show(
-                                                      context,
-                                                      coinsAwarded: coins,
-                                                      onComplete: () {
-                                                        NativeLogService.log(
+                                          left: leftBR,
+                                          top: topBR,
+                                          child: _buildCircleButton(
+                                            isTablet: isTablet,
+                                            size: circleSize,
+                                            showNotification: false,
+                                            onTap: () {
+                                              AdsFreePopup.show(
+                                                context,
+                                                onAdWatched: (coins) {
+                                                  VideoRewardDialog.show(
+                                                    context,
+                                                    coinsAwarded: coins,
+                                                    onComplete: () {
+                                                      NativeLogService.log(
                                                           'Video animation completed after ad watched',
                                                           tag: _logTag,
                                                           level: 'debug',
                                                         );
-                                                      },
-                                                    );
-                                                    // Refresh user data after ad watched
-                                                    _loadUserData();
-                                                  },
-                                                  onPurchaseComplete: () {
-                                                    // Refresh user data after purchase to update coin balance
-                                                    _loadUserData();
-                                                  },
-                                                );
-                                              },
-                                              customBorder: const CircleBorder(),
-                                              splashColor: Colors.white24,
-                                              highlightColor: Colors.white10,
-                                              child: SizedBox(
-                                                width: isTablet
-                                                    ? circleSize * 0.32
-                                                    : circleSize * 0.3,
-                                                height: isTablet
-                                                    ? circleSize * 0.32
-                                                    : circleSize * 0.3,
-                                                child: Image.asset(
-                                                  AppImages.adsfree,
-                                                  fit: BoxFit.contain,
+                                                    },
+                                                  );
+                                                  _loadUserData();
+                                                },
+                                                onPurchaseComplete: () {
+                                                  _loadUserData();
+                                                },
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 6.w,
+                                                vertical: 4.h,
+                                              ),
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: _buildCircleButtonText(
+                                                  'ADS\nFREE',
+                                                  isTablet,
                                                 ),
                                               ),
                                             ),
@@ -574,9 +695,9 @@ class _CustomTopBarState extends State<CustomTopBar> {
                     ),
                   ),
 
-                  SizedBox(width: 8.w),
+                  // SizedBox(width: 8.w),
 
-                  Material(
+                  /* Material(
                     color: Colors.transparent,
                     child: Container(
                       decoration: BoxDecoration(
@@ -601,7 +722,7 @@ class _CustomTopBarState extends State<CustomTopBar> {
                         ),
                       ),
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ),

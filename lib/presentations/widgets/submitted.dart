@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/constants/app_images.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class SubmittedPopup extends StatefulWidget {
   const SubmittedPopup({super.key});
@@ -61,7 +62,7 @@ class _SubmittedPopupState extends State<SubmittedPopup> {
 
               /// TITLE
               Text(
-                'Submitted',
+                AppLocalizations.submitted,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
                   color: Colors.white,

@@ -1,34 +1,37 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:inkbattle_frontend/widgets/text_widget.dart';
 import 'package:inkbattle_frontend/utils/lang.dart';
+import 'package:inkbattle_frontend/widgets/text_widget.dart';
 
-class SelectionBottomSheet extends StatefulWidget {
+/// Category multi-select bottom sheet matching country picker (SelectionBottomSheet) UI.
+/// Includes "Select All" and "Done" buttons aligned in the header.
+class RoomCategoryPickerSheet extends StatefulWidget {
   final String title;
   final List<String> items;
-  final String? selectedItem;
+  final List<String> selectedItems;
 
-  const SelectionBottomSheet({
+  const RoomCategoryPickerSheet({
     super.key,
     required this.title,
     required this.items,
-    this.selectedItem,
+    required this.selectedItems,
   });
 
   @override
-  State<SelectionBottomSheet> createState() => _SelectionBottomSheetState();
+  State<RoomCategoryPickerSheet> createState() => _RoomCategoryPickerSheetState();
 }
 
-class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
+class _RoomCategoryPickerSheetState extends State<RoomCategoryPickerSheet> {
   late List<String> _filteredItems;
+  late List<String> _tempSelectedItems;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _filteredItems = List.from(widget.items);
+    _tempSelectedItems = List.from(widget.selectedItems);
     _searchController.addListener(_onSearchChanged);
   }
 
@@ -47,8 +50,30 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
     });
   }
 
+  void _toggleItem(String item) {
+    setState(() {
+      if (_tempSelectedItems.contains(item)) {
+        _tempSelectedItems.remove(item);
+      } else {
+        _tempSelectedItems.add(item);
+      }
+    });
+  }
+
+  void _selectAll() {
+    setState(() {
+      if (_tempSelectedItems.length == widget.items.length) {
+        _tempSelectedItems.clear();
+      } else {
+        _tempSelectedItems = List.from(widget.items);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final allSelected = _tempSelectedItems.length == widget.items.length;
+
     return Container(
       padding: EdgeInsets.only(
         top: 20.h,
@@ -77,7 +102,6 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Handle bar for drag indication (optional but nice)
           Center(
             child: Container(
               width: 40.w,
@@ -90,16 +114,62 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
           ),
           SizedBox(height: 15.h),
 
-          // Title
-          TextWidget(
-            text: widget.title,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          // Header: Category (left) | Select All | Done (right) — single row, vertically centered
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  widget.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.lato(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: _selectAll,
+                style: TextButton.styleFrom(
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  allSelected
+                      ? AppLocalizations.deselectAll
+                      : AppLocalizations.selectAll,
+                  style: GoogleFonts.lato(
+                    color: const Color.fromRGBO(9, 189, 255, 1),
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(width: 4.w),
+              TextButton(
+                onPressed: () => Navigator.pop(context, _tempSelectedItems),
+                style: TextButton.styleFrom(
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  AppLocalizations.done,
+                  style: GoogleFonts.lato(
+                    color: const Color.fromRGBO(9, 189, 255, 1),
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 15.h),
 
-          // Search Field
+          // Search Field (same as SelectionBottomSheet / country UI)
           TextField(
             controller: _searchController,
             style: GoogleFonts.lato(color: Colors.white, fontSize: 16.sp),
@@ -118,7 +188,8 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
                 Icons.search,
                 color: Color.fromRGBO(9, 189, 255, 1),
               ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               filled: true,
               fillColor: Colors.black,
               border: OutlineInputBorder(
@@ -146,7 +217,6 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
           ),
           SizedBox(height: 15.h),
 
-          // List
           Expanded(
             child: _filteredItems.isEmpty
                 ? Center(
@@ -165,21 +235,18 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
                     ),
                     itemBuilder: (context, index) {
                       final item = _filteredItems[index];
-                      final isSelected = item == widget.selectedItem;
+                      final isSelected = _tempSelectedItems.contains(item);
                       return Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context, item);
-                          },
+                          onTap: () => _toggleItem(item),
                           borderRadius: BorderRadius.circular(10.r),
                           child: Container(
                             margin: EdgeInsets.symmetric(vertical: 4.h),
                             padding: EdgeInsets.symmetric(
-                              vertical: 13.h, // Reduced from 16.h
-                              horizontal: 12.w, // Added horizontal padding for "floating" look
+                              vertical: 13.h,
+                              horizontal: 12.w,
                             ),
-
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? const Color.fromRGBO(9, 189, 255, 0.1)
@@ -193,7 +260,8 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
                                     item,
                                     style: GoogleFonts.lato(
                                       color: isSelected
-                                          ? const Color.fromRGBO(9, 189, 255, 1)
+                                          ? const Color.fromRGBO(
+                                              9, 189, 255, 1)
                                           : Colors.white,
                                       fontSize: 16.sp,
                                       fontWeight: isSelected
@@ -206,9 +274,8 @@ class _SelectionBottomSheetState extends State<SelectionBottomSheet> {
                                   Icon(
                                     Icons.check_circle,
                                     color: const Color.fromRGBO(9, 189, 255, 1),
-                                    size: 26.sp, // Increased from 20
+                                    size: 26.sp,
                                   ),
-
                               ],
                             ),
                           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class ErrorPopup extends StatelessWidget {
   final String? message;
@@ -53,7 +54,7 @@ class ErrorPopup extends StatelessWidget {
               SizedBox(height: 20.h),
 
               Text(
-                'Error',
+                AppLocalizations.error,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
                   color: Colors.white,
@@ -65,7 +66,7 @@ class ErrorPopup extends StatelessWidget {
               SizedBox(height: 10.h),
 
               Text(
-                message ?? 'An unexpected error occurred.',
+                message ?? AppLocalizations.anUnexpectedErrorOccurred,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
                   color: Colors.white70,
@@ -91,7 +92,7 @@ class ErrorPopup extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Close',
+                  AppLocalizations.close,
                   style: GoogleFonts.lato(
                     color: Colors.white,
                     fontSize: 18.sp,

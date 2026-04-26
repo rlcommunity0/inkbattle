@@ -7,6 +7,7 @@ import 'package:inkbattle_frontend/presentations/widgets/form.dart';
 import 'package:inkbattle_frontend/presentations/widgets/submitted.dart';
 import 'package:inkbattle_frontend/repositories/user_repository.dart';
 import 'package:inkbattle_frontend/services/native_log_service.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class ErrorPopup extends StatelessWidget {
   ErrorPopup({
@@ -79,7 +80,7 @@ class ErrorPopup extends StatelessWidget {
 
               /// TITLE
               Text(
-                'Report an Issue',
+                AppLocalizations.reportAnIssue,
                 style: GoogleFonts.lato(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -90,7 +91,7 @@ class ErrorPopup extends StatelessWidget {
               SizedBox(height: 8.h),
 
               Text(
-                'Help us keep the game fun and safe',
+                AppLocalizations.helpKeepGameFunAndSafe,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
                   color: const Color(0xFF979595),
@@ -106,9 +107,9 @@ class ErrorPopup extends StatelessWidget {
                 children: [
                   _buildOptionButton(
                     context,
-                    title: 'Report Member',
+                    title: AppLocalizations.reportMember,
                     subtitle:
-                        'Report inappropriate chat, name, or behavior',
+                        AppLocalizations.reportInappropriateChat,
                     imagePath: AppImages.reportmember,
                     onPressed: () {
                       NativeLogService.log(
@@ -133,9 +134,9 @@ class ErrorPopup extends StatelessWidget {
 
                   _buildOptionButton(
                     context,
-                    title: 'Report Drawing',
+                    title: AppLocalizations.reportDrawing,
                     subtitle:
-                        'Report if someone draws answers or offensive content',
+                        AppLocalizations.reportDrawingDescription,
                     imagePath: AppImages.reportdrawing,
                     onPressed: () async {
                       NativeLogService.log(
@@ -152,9 +153,9 @@ class ErrorPopup extends StatelessWidget {
                         );
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                'You can report the drawer only during drawing or reveal phase.',
+                                AppLocalizations.reportDrawerOnlyDuringPhase,
                               ),
                             ),
                           );

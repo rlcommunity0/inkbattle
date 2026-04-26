@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inkbattle_frontend/constants/app_images.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class ExitPopUp extends StatelessWidget {
-  final String imagePath;
+  final String? imagePath;
   final VoidCallback? onExit;
   final VoidCallback? continueWaiting;
   final String? text;
 
   const ExitPopUp({
-    required this.imagePath,
+    this.imagePath,
     this.onExit,
     this.continueWaiting,
     this.text,
@@ -25,159 +26,126 @@ class ExitPopUp extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(
           // Prevents popup from becoming too wide on tablets
-          maxWidth: isTablet
-              ? 420.w
-              : MediaQuery.of(context).size.width * 0.9,
+          maxWidth:
+              isTablet ? 420.w : MediaQuery.of(context).size.width * 0.9,
         ),
         child: Container(
-          padding: const EdgeInsets.all(2),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20.w,
+            vertical: 24.h,
+          ),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF7537E0), Color(0xFF286FD3)],
+              colors: [
+                Color(0xFF1C1C30),
+                Color(0xFF0E0E1A),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(18.r),
+            border: Border.all(
+              color: Colors.blueAccent,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blueAccent.withOpacity(0.3),
+                blurRadius: 12,
+                spreadRadius: 1,
+              ),
+            ],
           ),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20.w,
-              vertical: 24.h,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                /// IMAGE
-                SizedBox(
-                  height: isTablet ? 120.h : 140.h,
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.contain,
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              /// HEADER
+              Text(
+                AppLocalizations.leaveRoom,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.luckiestGuy(
+                  color: Colors.amber,
+                  fontSize: isTablet ? 22.sp : 18.sp,
+                  decoration: TextDecoration.none,
                 ),
+              ),
 
-                SizedBox(height: 25.h),
+              SizedBox(height: 18.h),
 
-                /// TITLE + MESSAGE
-                if (text == null) ...[
-                  Text(
-                    'You\'ve been inactive',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                      color: Colors.white,
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w600,
-                      decoration: TextDecoration.none,
+              /// MESSAGE
+              Text(
+                text ?? AppLocalizations.doYouReallyWantToLeaveRoom,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lato(
+                  color: Colors.white,
+                  fontSize: isTablet ? 16.sp : 14.sp,
+                  fontWeight: FontWeight.w500,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+
+              SizedBox(height: 26.h),
+
+              /// BUTTONS
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        continueWaiting?.call();
+                        Navigator.pop(context);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white54),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        minimumSize: Size(
+                          isTablet ? 140.w : 120.w,
+                          45.h,
+                        ),
+                      ),
+                      child: Text(
+                        AppLocalizations.cancel.toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    'You\'ve been away for a while.\nWant to jump back in?',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                      color: Colors.white,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                ] else
-                  Text(
-                    text!,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                      color: Colors.white,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-
-                SizedBox(height: 30.h),
-
-                /// BUTTONS
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
                         onExit?.call();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD0C9C9),
+                        backgroundColor: Colors.redAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         minimumSize: Size(
                           isTablet ? 140.w : 120.w,
                           45.h,
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Exit',
-                            style: GoogleFonts.lato(
-                              color: Colors.black,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Image.asset(
-                            AppImages.inactiveexit,
-                            height: 25.h,
-                            width: 25.w,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    SizedBox(width: 15.w),
-
-                    ElevatedButton(
-                      onPressed: () {
-                        continueWaiting?.call();
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFFFFF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        minimumSize: Size(
-                          isTablet ? 140.w : 120.w,
-                          45.h,
+                      child: Text(
+                        AppLocalizations.exitButton,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            AppImages.resume,
-                            height: 25.h,
-                            width: 25.w,
-                          ),
-                          SizedBox(width: 8.w),
-                          Text(
-                            'Resume',
-                            style: GoogleFonts.lato(
-                              color: Colors.black,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

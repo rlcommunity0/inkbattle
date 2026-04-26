@@ -47,183 +47,210 @@ class _InstructionsScreenState extends State<InstructionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(360, 800),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return Scaffold(
-          key: ValueKey(AppLocalizations
-              .getCurrentLanguage()), // Force rebuild on language change
-          backgroundColor: const Color(0xFF1A2A44),
-          body: SafeArea(
-            bottom: true, // Protect bottom for ad visibility
-            child: Column(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 15.h, horizontal: 8.w),
-                            child: Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const CustomSvgImage(
-                                    imageUrl: AppImages.arrow_back,
-                                    height: 25,
-                                    width: 25,
-                                  ),
+    final size = MediaQuery.of(context).size;
+    final bool isTablet = size.shortestSide >= 600;
+    final double horizontalPadding = isTablet ? 48.w : 24.w;
+    final double contentMaxWidth = isTablet ? 560 : double.infinity;
+
+    return Scaffold(
+      key: ValueKey(AppLocalizations
+          .getCurrentLanguage()), // Force rebuild on language change
+      backgroundColor: const Color(0xFF1A2A44),
+      body: SafeArea(
+        bottom: true, // Protect bottom for ad visibility
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Header: back button + title (responsive, no title wrap)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: 12.h,
+                        bottom: 8.h,
+                      ),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            behavior: HitTestBehavior.opaque,
+                            child: Padding(
+                              padding: EdgeInsets.all(4.w),
+                              child: CustomSvgImage(
+                                imageUrl: AppImages.arrow_back,
+                                height: isTablet ? 32 : 24,
+                                width: isTablet ? 32 : 24,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                AppLocalizations.instructions,
+                                style: GoogleFonts.lato(
+                                  color: Colors.white,
+                                  fontSize: isTablet ? 22.sp : 21.sp,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      AppLocalizations.instructions,
-                                      style: GoogleFonts.lato(
-                                        color: Colors.white,
-                                        fontSize: 30.sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                // Balance key for true centering
-                                const SizedBox(width: 25, height: 25),
-                              ],
-                            )),
-                        // Adjusted spacing to match visually with screenshot
-                        SizedBox(height: 50.h), 
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  randomInstruction,
-                                  style: GoogleFonts.lato(
-                                    color: Colors.white,
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.5,
-                                  ),
-                                  textAlign: TextAlign.justify, // Better visuals for block text
-                                ),
-                              ],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: isTablet ? 40 : 32), // Balance back button for visual center
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isTablet ? 32.h : 24.h),
+                    // Scrollable instruction text with readable width
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: contentMaxWidth),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
+                            child: Text(
+                              randomInstruction,
+                              style: GoogleFonts.lato(
+                                color: Colors.white,
+                                fontSize: isTablet ? 18.sp : 17.sp,
+                                fontWeight: FontWeight.w400,
+                                height: 1.6,
+                              ),
+                              textAlign: TextAlign.left,
                             ),
                           ),
                         ),
-                        // Removed Spacer to stick button to bottom area or use bottom padding
-                        // Using Padding to push button up slightly from bottom
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 30.h),
-                          child: SizedBox(
-                            width: 0.85.sw, // 85% of screen width (mobile & tablet)
-                            height: 65.h,   // Consistent height scaling
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  isToggleOn = !isToggleOn;
-                                  NativeLogService.log('Toggle status changed: $isToggleOn', tag: _logTag, level: 'debug');
-                                  LocalStorageUtils.setTutorialShown(isToggleOn);
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.r),
+                      ),
+                    ),
+                    // Tutorial guide button (responsive width, centered)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: 24.h,
+                        bottom: 24.h,
+                      ),
+                      child: Center(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final double buttonWidth = isTablet
+                                ? (constraints.maxWidth > 400 ? 380 : constraints.maxWidth * 0.85)
+                                : constraints.maxWidth * 0.88;
+                            final double buttonHeight = isTablet ? 64.h : 56.h;
+                            return SizedBox(
+                              width: buttonWidth,
+                              height: buttonHeight,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isToggleOn = !isToggleOn;
+                                    NativeLogService.log('Toggle status changed: $isToggleOn', tag: _logTag, level: 'debug');
+                                    LocalStorageUtils.setTutorialShown(isToggleOn);
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
                                 ),
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                              ),
-                              child: Material(
-                                type: MaterialType.transparency,
-                                borderRadius: BorderRadius.circular(15.r),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(15.r),
-                                  splashColor: Colors.blue.withOpacity(0.3),
-                                  highlightColor: Colors.blue.withOpacity(0.1),
-                                  onTap: () {
-                                    setState(() {
-                                      isToggleOn = !isToggleOn;
-                                      LocalStorageUtils.setTutorialShown(isToggleOn);
-                                    });
-                                  },
-                                  child: Container(
-                                    width: 0.85.sw,
-                                    height: 65.h,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 12.w, vertical: 15.h),
-                                    decoration: BoxDecoration(
-                                      image: const DecorationImage(
-                                        image: AssetImage(AppImages.bluebutton),
-                                        fit: BoxFit.fill,
+                                child: Material(
+                                  type: MaterialType.transparency,
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    splashColor: Colors.blue.withOpacity(0.3),
+                                    highlightColor: Colors.blue.withOpacity(0.1),
+                                    onTap: () {
+                                      setState(() {
+                                        isToggleOn = !isToggleOn;
+                                        NativeLogService.log('Toggle status changed: $isToggleOn', tag: _logTag, level: 'debug');
+                                        LocalStorageUtils.setTutorialShown(isToggleOn);
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 20.w,
+                                        vertical: 12.h,
                                       ),
-                                      borderRadius: BorderRadius.circular(15.r),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.tutorialGuide,
-                                          style: GoogleFonts.luckiestGuy(
-                                            color: Colors.white,
-                                            fontSize: 24.sp,
-                                            fontWeight: FontWeight.w400,
-                                            letterSpacing: 1.2,
-                                          ),
+                                      decoration: BoxDecoration(
+                                        image: const DecorationImage(
+                                          image: AssetImage(AppImages.bluebutton),
+                                          fit: BoxFit.fill,
                                         ),
-                                        SizedBox(width: 15.w),
-                                        Container(
-                                          width: 28.w,
-                                          height: 28.w,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(6.0),
-                                            border: Border.all(
-                                              color: isToggleOn
-                                                  ? Colors.green
-                                                  : Colors.grey.shade400,
-                                              width: 2.0,
+                                        borderRadius: BorderRadius.circular(12.r),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Flexible(
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                AppLocalizations.tutorialGuide,
+                                                style: GoogleFonts.luckiestGuy(
+                                                  color: Colors.white,
+                                                  fontSize: isTablet ? 26.sp : 20.sp,
+                                                  fontWeight: FontWeight.w400,
+                                                  letterSpacing: 0.8,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                          alignment: Alignment.center,
-                                          child: isToggleOn
-                                              ? Icon(
-                                                  Icons.check,
-                                                  size: 22.w,
-                                                  color: Colors.green,
-                                                )
-                                              : null,
-                                        ),
-                                      ],
+                                          SizedBox(width: 12.w),
+                                          Container(
+                                            width: isTablet ? 28 : 24,
+                                            height: isTablet ? 28 : 24,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(6.r),
+                                              border: Border.all(
+                                                color: isToggleOn
+                                                    ? Colors.green
+                                                    : Colors.grey.shade400,
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: isToggleOn
+                                                ? Icon(
+                                                    Icons.check,
+                                                    size: isTablet ? 18 : 16,
+                                                    color: Colors.green,
+                                                  )
+                                                : null,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                
-                // Persistent Banner Ad (app-wide, loaded once)
-                const PersistentBannerAdWidget(),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            // Persistent Banner Ad (app-wide, loaded once)
+            const PersistentBannerAdWidget(),
+          ],
+        ),
+      ),
     );
   }
 }

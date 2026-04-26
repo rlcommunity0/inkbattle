@@ -128,7 +128,7 @@ class _SignInScreenState extends State<SignInScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.googleSignInFailed)),
+            SnackBar(content: Text(AppLocalizations.appleSignInFailed)),
           );
         }
       }
@@ -249,269 +249,496 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   @override
+  // Widget build(BuildContext context) {
+  //   final screenWidth = MediaQuery.of(context).size.width;
+  //   final screenHeight = MediaQuery.of(context).size.height;
+
+  //   return BackgroundScaffold(
+  //     child: Padding(
+  //       padding: EdgeInsets.symmetric(
+  //         horizontal: screenWidth * 0.04,
+  //         vertical: screenHeight * 0.015,
+  //       ),
+  //       child: SingleChildScrollView(
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.center,
+  //           children: [
+  //             Stack(
+  //               alignment: Alignment.center,
+  //               children: [
+  //                 Image.asset(
+  //                   AppImages.splashLogo,
+  //                   width: screenWidth * 0.9,
+  //                   height: screenHeight * 0.5,
+  //                   fit: BoxFit.contain,
+  //                 ),
+  //                 Positioned(
+  //                   top: screenHeight * 0.41,
+  //                   child: TextWidget(
+  //                     text: AppLocalizations.inkBattle,
+  //                     style: GoogleFonts.poppins(
+  //                       fontWeight: FontWeight.bold,
+  //                       color: AppColors.whiteColor,
+  //                       fontSize: screenWidth * 0.05,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //             SizedBox(height: screenHeight * 0.02),
+  //             Padding(
+  //               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+  //               child: Container(
+  //                 height: screenHeight * 0.07,
+  //                 width: double.infinity,
+  //                 decoration: BoxDecoration(
+  //                   gradient: const LinearGradient(
+  //                     colors: [
+  //                       Color.fromRGBO(255, 255, 255, 1),
+  //                       Color.fromRGBO(0, 186, 255, 1),
+  //                     ],
+  //                   ),
+  //                   borderRadius: BorderRadius.circular(50),
+  //                 ),
+  //                 child: ElevatedButton(
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: Colors.transparent,
+  //                     foregroundColor: Colors.transparent,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(50),
+  //                       side: const BorderSide(color: Colors.grey),
+  //                     ),
+  //                     padding: EdgeInsets.symmetric(
+  //                       vertical: screenHeight * 0.018,
+  //                     ),
+  //                   ),
+  //                   onPressed: Platform.isIOS
+  //                       ? (_isAppleLoading ? null : _signInWithApple)
+  //                       : (_isGoogleLoading ? null : _signInWithGoogle),
+  //                   child: Row(
+  //                     mainAxisAlignment: MainAxisAlignment.start,
+  //                     crossAxisAlignment: CrossAxisAlignment.center,
+  //                     children: [
+  //                       SizedBox(width: 30.w),
+  //                       if (Platform.isIOS)
+  //                         (_isAppleLoading
+  //                             ? SizedBox(
+  //                                 height: screenHeight * 0.03,
+  //                                 width: screenHeight * 0.03,
+  //                                 child: const CircularProgressIndicator(
+  //                                     strokeWidth: 2),
+  //                               )
+  //                             : Icon(
+  //                                 Icons.apple,
+  //                                 size: screenHeight * 0.03,
+  //                                 color: Colors.black,
+  //                               ))
+  //                       else
+  //                         (_isGoogleLoading
+  //                             ? SizedBox(
+  //                                 height: screenHeight * 0.03,
+  //                                 width: screenHeight * 0.03,
+  //                                 child: const CircularProgressIndicator(
+  //                                     strokeWidth: 2),
+  //                               )
+  //                             : Image.asset(
+  //                                 AppImages.googlePng,
+  //                                 height: screenHeight * 0.03,
+  //                                 width: screenHeight * 0.03,
+  //                               )),
+  //                       SizedBox(width: 30.w),
+  //                       TextWidget(
+  //                         text: Platform.isIOS
+  //                             ? ( _isAppleLoading
+  //                                 ? AppLocalizations.signingIn
+  //                                 : 'Sign in with Apple')
+  //                             : (_isGoogleLoading
+  //                                 ? AppLocalizations.signingIn
+  //                                 : AppLocalizations.signInWithGoogle),
+  //                         style: GoogleFonts.lato(
+  //                           fontSize: 14.sp,
+  //                           color: const Color(0xFF000000),
+  //                           fontWeight: FontWeight.w600,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(height: screenHeight * 0.02),
+  //             Padding(
+  //               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+  //               child: Container(
+  //                 height: screenHeight * 0.07,
+  //                 width: double.infinity,
+  //                 decoration: BoxDecoration(
+  //                   color: const Color.fromRGBO(8, 102, 255, 1),
+  //                   borderRadius: BorderRadius.circular(50),
+  //                 ),
+  //                 child: ElevatedButton(
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: Colors.transparent,
+  //                     foregroundColor: Colors.transparent,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(50),
+  //                     ),
+  //                     padding: EdgeInsets.symmetric(
+  //                       vertical: screenHeight * 0.018,
+  //                     ),
+  //                   ),
+  //                   onPressed: _isFacebookLoading ? null : _signInWithFacebook,
+  //                   child: Row(
+  //                     mainAxisAlignment: MainAxisAlignment.start,
+  //                     crossAxisAlignment: CrossAxisAlignment.center,
+  //                     children: [
+  //                       SizedBox(width: 30.w),
+  //                       _isFacebookLoading
+  //                           ? SizedBox(
+  //                               height: screenHeight * 0.03,
+  //                               width: screenHeight * 0.03,
+  //                               child: const CircularProgressIndicator(
+  //                                   strokeWidth: 2, color: Colors.white),
+  //                             )
+  //                           : Image.asset(
+  //                               AppImages.facebookSvg,
+  //                               height: screenHeight * 0.03,
+  //                               width: screenHeight * 0.03,
+  //                             ),
+  //                       SizedBox(width: 30.w),
+  //                       TextWidget(
+  //                         text: _isFacebookLoading
+  //                             ? AppLocalizations.signingIn
+  //                             : AppLocalizations.signInWithFacebook,
+  //                         style: GoogleFonts.lato(
+  //                           fontSize: 14.sp,
+  //                           color: const Color(0xFFFFFFFF),
+  //                           fontWeight: FontWeight.w500,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(height: screenHeight * 0.02),
+  //             TextWidget(
+  //               text: AppLocalizations.or,
+  //               style: GoogleFonts.poppins(
+  //                 color: AppColors.whiteColor,
+  //                 fontWeight: FontWeight.w800,
+  //                 fontSize: screenWidth * 0.04,
+  //               ),
+  //             ),
+  //             SizedBox(height: screenHeight * 0.02),
+  //             Padding(
+  //               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+  //               child: Container(
+  //                 height: screenHeight * 0.07,
+  //                 width: double.infinity,
+  //                 decoration: BoxDecoration(
+  //                   gradient: const LinearGradient(
+  //                     colors: [
+  //                       Color.fromRGBO(83, 128, 246, 1),
+  //                       Color.fromRGBO(79, 62, 207, 1),
+  //                     ],
+  //                   ),
+  //                   borderRadius: BorderRadius.circular(50),
+  //                 ),
+  //                 child: ElevatedButton(
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: Colors.transparent,
+  //                     foregroundColor: Colors.transparent,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(50),
+  //                       side: const BorderSide(color: Colors.grey),
+  //                     ),
+  //                     padding: EdgeInsets.symmetric(
+  //                       vertical: screenHeight * 0.018,
+  //                     ),
+  //                   ),
+  //                   onPressed: () {
+  //                     context.push(Routes.guestSignupScreen);
+  //                   },
+  //                   child: Row(
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     children: [
+  //                       TextWidget(
+  //                         text: AppLocalizations.playAsGuest,
+  //                         style: TextStyle(
+  //                           fontSize: screenWidth * 0.04,
+  //                           color: AppColors.whiteColor,
+  //                           fontWeight: FontWeight.w600,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             SizedBox(height: screenHeight * 0.02),
+  //             TextWidget(
+  //               text: AppLocalizations.progressNotSaved,
+  //               style: GoogleFonts.lato(
+  //                 fontSize: screenWidth * 0.03,
+  //                 fontWeight: FontWeight.w500,
+  //                 color: const Color(0xFFB6B6B6),
+  //               ),
+  //             ),
+  //             SizedBox(height: screenHeight * 0.03),
+  //             // RichText(
+  //             //   text: TextSpan(
+  //             //     text: "Don’t you have an account ? ",
+  //             //     style: GoogleFonts.dmSans(
+  //             //         color: AppColors.whiteColor,
+  //             //         fontSize: 14.sp,
+  //             //         fontWeight: FontWeight.w500),
+  //             //     children: [
+  //             //       TextSpan(
+  //             //         text: ' Signup',
+  //             //         style: GoogleFonts.dmSans(
+  //             //           color: const Color.fromRGBO(9, 189, 255, 1),
+  //             //           fontWeight: FontWeight.w500,
+  //             //         ),
+  //             //         recognizer: TapGestureRecognizer()
+  //             //           ..onTap = () {
+  //             //             context.push(Routes.signupScreen);
+  //             //           },
+  //             //       ),
+  //             //     ],
+  //             //   ),
+  //             // )
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
+    // final isTablet = screenWidth >= 600;
+  final isTablet = MediaQuery.of(context).size.shortestSide >= 600;
     return BackgroundScaffold(
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.04,
-          vertical: screenHeight * 0.015,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Image.asset(
-                    AppImages.splashLogo,
-                    width: screenWidth * 0.9,
-                    height: screenHeight * 0.5,
-                    fit: BoxFit.contain,
-                  ),
-                  Positioned(
-                    top: screenHeight * 0.41,
-                    child: TextWidget(
+      child: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isTablet ? 530 : double.infinity,
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 24 : 20,
+                  vertical: 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+
+                    /// ================= LOGO SECTION =================
+                    SizedBox(height: isTablet ? 45 : 20),
+
+                    Image.asset(
+                      AppImages.splashLogo,
+                      width: isTablet ? 500 : screenWidth * 0.75,
+                      fit: BoxFit.contain,
+                    ),
+
+                    SizedBox(height: 20),
+
+                    TextWidget(
                       text: AppLocalizations.inkBattle,
                       style: GoogleFonts.poppins(
+                        fontSize: isTablet ? 32 : 22,
                         fontWeight: FontWeight.bold,
                         color: AppColors.whiteColor,
-                        fontSize: screenWidth * 0.05,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-                child: Container(
-                  height: screenHeight * 0.07,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color.fromRGBO(255, 255, 255, 1),
-                        Color.fromRGBO(0, 186, 255, 1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        side: const BorderSide(color: Colors.grey),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.018,
-                      ),
-                    ),
-                    onPressed: Platform.isIOS
-                        ? (_isAppleLoading ? null : _signInWithApple)
-                        : (_isGoogleLoading ? null : _signInWithGoogle),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(width: 30.w),
-                        if (Platform.isIOS)
-                          (_isAppleLoading
-                              ? SizedBox(
-                                  height: screenHeight * 0.03,
-                                  width: screenHeight * 0.03,
-                                  child: const CircularProgressIndicator(
-                                      strokeWidth: 2),
-                                )
-                              : Icon(
-                                  Icons.apple,
-                                  size: screenHeight * 0.03,
-                                  color: Colors.black,
-                                ))
-                        else
-                          (_isGoogleLoading
-                              ? SizedBox(
-                                  height: screenHeight * 0.03,
-                                  width: screenHeight * 0.03,
-                                  child: const CircularProgressIndicator(
-                                      strokeWidth: 2),
-                                )
-                              : Image.asset(
-                                  AppImages.googlePng,
-                                  height: screenHeight * 0.03,
-                                  width: screenHeight * 0.03,
-                                )),
-                        SizedBox(width: 30.w),
-                        TextWidget(
-                          text: Platform.isIOS
-                              ? ( _isAppleLoading
-                                  ? AppLocalizations.signingIn
-                                  : 'Sign in with Apple')
-                              : (_isGoogleLoading
-                                  ? AppLocalizations.signingIn
-                                  : AppLocalizations.signInWithGoogle),
-                          style: GoogleFonts.lato(
-                            fontSize: 14.sp,
-                            color: const Color(0xFF000000),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-                child: Container(
-                  height: screenHeight * 0.07,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(8, 102, 255, 1),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.018,
-                      ),
-                    ),
-                    onPressed: _isFacebookLoading ? null : _signInWithFacebook,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(width: 30.w),
-                        _isFacebookLoading
-                            ? SizedBox(
-                                height: screenHeight * 0.03,
-                                width: screenHeight * 0.03,
-                                child: const CircularProgressIndicator(
-                                    strokeWidth: 2, color: Colors.white),
-                              )
-                            : Image.asset(
-                                AppImages.facebookSvg,
-                                height: screenHeight * 0.03,
-                                width: screenHeight * 0.03,
-                              ),
-                        SizedBox(width: 30.w),
-                        TextWidget(
-                          text: _isFacebookLoading
+
+                    SizedBox(height: isTablet ? 40 : 30),
+
+                    /// ================= GOOGLE / APPLE BUTTON =================
+                    _buildSocialButton(
+                      isTablet: isTablet,
+                      isLoading:
+                          Platform.isIOS ? _isAppleLoading : _isGoogleLoading,
+                      text: Platform.isIOS
+                          ? (_isAppleLoading
                               ? AppLocalizations.signingIn
-                              : AppLocalizations.signInWithFacebook,
-                          style: GoogleFonts.lato(
-                            fontSize: 14.sp,
-                            color: const Color(0xFFFFFFFF),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              TextWidget(
-                text: AppLocalizations.or,
-                style: GoogleFonts.poppins(
-                  color: AppColors.whiteColor,
-                  fontWeight: FontWeight.w800,
-                  fontSize: screenWidth * 0.04,
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-                child: Container(
-                  height: screenHeight * 0.07,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color.fromRGBO(83, 128, 246, 1),
-                        Color.fromRGBO(79, 62, 207, 1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        side: const BorderSide(color: Colors.grey),
+                              : "Sign in with Apple")
+                          : (_isGoogleLoading
+                              ? AppLocalizations.signingIn
+                              : AppLocalizations.signInWithGoogle),
+                      icon: Platform.isIOS
+                          ? Icon(
+                              Icons.apple,
+                              size: isTablet ? 36 : 28,
+                              color: Colors.black,
+                            )
+                          : Image.asset(
+                              AppImages.googlePng,
+                              height: isTablet ? 34 : 26,
+                              width: isTablet ? 34 : 26,
+                              fit: BoxFit.contain,
+                            ),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFFFFFFF),
+                          Color(0xFF00BAFF),
+                        ],
                       ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.018,
+                      textColor: Colors.black,
+                      onTap: Platform.isIOS
+                          ? (_isAppleLoading ? null : _signInWithApple)
+                          : (_isGoogleLoading ? null : _signInWithGoogle),
+                    ),
+
+                    SizedBox(height: 16),
+
+                    /// ================= FACEBOOK BUTTON =================
+                    _buildSocialButton(
+                      isTablet: isTablet,
+                      isLoading: _isFacebookLoading,
+                      text: _isFacebookLoading
+                          ? AppLocalizations.signingIn
+                          : AppLocalizations.signInWithFacebook,
+                      icon: Icon(
+                        Icons.facebook,
+                        size: isTablet ? 36 : 28,
+                      ),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF0866FF),
+                          Color(0xFF0866FF),
+                        ],
+                      ),
+                      textColor: Colors.white,
+                      onTap: _isFacebookLoading ? null : _signInWithFacebook,
+                    ),
+
+                    SizedBox(height: 24),
+
+                    /// ================= OR =================
+                    TextWidget(
+                      text: AppLocalizations.or,
+                      style: GoogleFonts.poppins(
+                        fontSize: isTablet ? 22 : 17,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.whiteColor,
                       ),
                     ),
-                    onPressed: () {
-                      context.push(Routes.guestSignupScreen);
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextWidget(
-                          text: AppLocalizations.playAsGuest,
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.04,
-                            color: AppColors.whiteColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+
+                    SizedBox(height: 24),
+
+                    /// ================= GUEST BUTTON =================
+                    _buildSocialButton(
+                      isTablet: isTablet,
+                      isLoading: false,
+                      text: AppLocalizations.playAsGuest,
+                      icon: const SizedBox(),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF5380F6),
+                          Color(0xFF4F3ECF),
+                        ],
+                      ),
+                      textColor: Colors.white,
+                      centerText: true,
+                      onTap: () {
+                        context.push(Routes.guestSignupScreen);
+                      },
                     ),
-                  ),
+
+                    SizedBox(height: 16),
+
+                    TextWidget(
+                      text: AppLocalizations.progressNotSaved,
+                      style: GoogleFonts.lato(
+                        fontSize: isTablet ? 14 : 12,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFFB6B6B6),
+                      ),
+                    ),
+
+                    SizedBox(height: 30),
+                  ],
                 ),
               ),
-              SizedBox(height: screenHeight * 0.02),
-              TextWidget(
-                text: AppLocalizations.progressNotSaved,
-                style: GoogleFonts.lato(
-                  fontSize: screenWidth * 0.03,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFFB6B6B6),
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.03),
-              // RichText(
-              //   text: TextSpan(
-              //     text: "Don’t you have an account ? ",
-              //     style: GoogleFonts.dmSans(
-              //         color: AppColors.whiteColor,
-              //         fontSize: 14.sp,
-              //         fontWeight: FontWeight.w500),
-              //     children: [
-              //       TextSpan(
-              //         text: ' Signup',
-              //         style: GoogleFonts.dmSans(
-              //           color: const Color.fromRGBO(9, 189, 255, 1),
-              //           fontWeight: FontWeight.w500,
-              //         ),
-              //         recognizer: TapGestureRecognizer()
-              //           ..onTap = () {
-              //             context.push(Routes.signupScreen);
-              //           },
-              //       ),
-              //     ],
-              //   ),
-              // )
-            ],
+            ),
           ),
         ),
       ),
     );
   }
+  Widget _buildSocialButton({
+  required bool isTablet,
+  required bool isLoading,
+  required String text,
+  required Widget icon,
+  required Gradient gradient,
+  required Color textColor,
+  required VoidCallback? onTap,
+  bool centerText = false,
+}) {
+  final double buttonHeight = isTablet ? 87 : 54;
+  final double iconSize = isTablet ? 58 : 40;
+  final double textSize = isTablet ? 28 : 18;
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      height: buttonHeight,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: isLoading
+            ? Center(
+                child: SizedBox(
+                  height: iconSize,
+                  width: iconSize,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: textColor,
+                  ),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: centerText
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (!centerText) ...[
+                    Container(
+                      height: iconSize,
+                      width: iconSize,
+                      alignment: Alignment.center,
+                      child: icon,
+                    ),
+                    const SizedBox(width: 16),
+                  ],
+                  Expanded(
+                    child: Text(
+                      text,
+                      textAlign: centerText
+                          ? TextAlign.center
+                          : TextAlign.start,
+                      style: GoogleFonts.lato(
+                        fontSize: textSize,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    ),
+  );
+}
+
 }

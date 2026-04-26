@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:inkbattle_frontend/utils/lang.dart';
 
 class ColorPalette extends StatelessWidget {
   final ValueNotifier<Color> selectedColorListenable;
@@ -94,7 +95,7 @@ class ColorPalette extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Pick a color!'),
+          title: Text(AppLocalizations.pickAColor),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: color.value,
@@ -105,7 +106,7 @@ class ColorPalette extends StatelessWidget {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Done'),
+              child: Text(AppLocalizations.done),
               onPressed: () => Navigator.pop(context),
             ),
           ],

@@ -55,8 +55,8 @@ class _TeamVsTeamScreenState extends State<TeamVsTeamScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Failed to join room: '
-                    '${failure.message ?? 'Please check the code and try again.'}'),
+                content: Text('${AppLocalizations.failedToJoinRoom}'
+                    '${failure.message ?? AppLocalizations.pleaseCheckCode}'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -65,9 +65,9 @@ class _TeamVsTeamScreenState extends State<TeamVsTeamScreen> {
         (roomResponse) async {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content:
-                    Text('Successfully joined room! Entry cost: 250 coins'),
+                    Text('${AppLocalizations.successfullyJoinedRoomEntryCost}250 ${AppLocalizations.coins}'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -82,7 +82,7 @@ class _TeamVsTeamScreenState extends State<TeamVsTeamScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('${AppLocalizations.error}: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

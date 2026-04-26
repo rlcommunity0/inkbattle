@@ -5,6 +5,7 @@ class AppImages {
   static const String coin1 = "asset/image/coin1.png";
   static const String coin = "asset/image/coin.png";
   static const String coin2 = "asset/image/coin2.png";
+  static const String coinsss = "asset/image/coinsss.png";
   static const String gameCoin = "asset/image/gameCoin.png";
   static const String medal1 = "asset/image/medal-1.png";
   static const String medal2 = "asset/image/medal-2.png";
@@ -137,6 +138,7 @@ class AppImages {
   static const String userSvg = "asset/svg/user.svg";
   static const String languageSvg = "asset/svg/language.svg";
   static const String coutrySvg = "asset/svg/country.svg";
+  static const String dropdownIcon = "asset/image/dropdown_icon.png";
   static const String home_menu_iconSvg = "asset/svg/home_menu_icon.svg";
   static const String settingsSvg = "asset/svg/settings.svg";
   static const String twitterSvg = "asset/svg/twitter.svg";

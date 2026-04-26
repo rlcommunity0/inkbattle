@@ -13,9 +13,9 @@ class CustomRoomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isTablet = MediaQuery.of(context).size.width > 600;
-    double buttonWidth = isTablet ? 0.45.sw : 0.6.sw;
+    double buttonWidth = isTablet ? 0.55.sw : 0.6.sw;
     double buttonHeight = isTablet ? 70.h : 0.08.sh;
-
+    final double textSize = isTablet ? 20.sp : 18.sp;
     return SizedBox(
       width: buttonWidth,
       height: buttonHeight,
@@ -61,7 +61,7 @@ class CustomRoomButton extends StatelessWidget {
                       Text(
                         text,
                         style: GoogleFonts.luckiestGuy(
-                          fontSize: 18.sp, // Target size
+                          fontSize: textSize, // Target size
                           fontWeight: FontWeight.w400,
                           foreground: Paint()
                             ..style = PaintingStyle.stroke
@@ -72,7 +72,7 @@ class CustomRoomButton extends StatelessWidget {
                       Text(
                         text,
                         style: GoogleFonts.luckiestGuy(
-                          fontSize: 18.sp,
+                          fontSize: textSize,
                           fontWeight: FontWeight.w400,
                           color: Colors.white,
                         ),
