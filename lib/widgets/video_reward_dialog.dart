@@ -102,86 +102,101 @@ class _VideoRewardDialogState extends State<VideoRewardDialog>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Full screen video
-          Center(
-            child: _isVideoInitialized &&
-                _videoController != null &&
-                _videoController!.value.isInitialized
-                ? ClipOval(
-                    child: Container(
-                      width: 340.w,
-                      height: 340.w,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black,
+    // We intentionally consume the system back button here.
+    // Users should not be able to dismiss/exit during the reward flow.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        // Do nothing (consume back).
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Full screen video
+            Center(
+              child: _isVideoInitialized &&
+                      _videoController != null &&
+                      _videoController!.value.isInitialized
+                  ? ClipOval(
+                      child: Container(
+                        width: 340.w,
+                        height: 340.w,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.cover,
+                          child: SizedBox(
+                            width: _videoController!.value.size.width,
+                            height: _videoController!.value.size.height,
+                            child: VideoPlayer(_videoController!),
+                          ),
+                        ),
                       ),
-                      child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _videoController!.value.size.width,
-                          height: _videoController!.value.size.height,
-                          child: VideoPlayer(_videoController!),
+                    )
+                  : const CircularProgressIndicator(color: Colors.white),
+            ),
+            // Overlay content
+            Positioned.fill(
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    // Coin container on top
+                    CoinContainer(coins: widget.coinsAwarded),
+                    const Spacer(),
+                    // Animated coins count
+                    AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        final count = (widget.coinsAwarded * _controller.value)
+                            .round()
+                            .clamp(0, widget.coinsAwarded);
+                        return TextWidget(
+                          text: "+ $count Coins",
+                          fontSize: 25.sp,
+                          color: AppColors.whiteColor,
+                          fontWeight: FontWeight.bold,
+                        );
+                      },
+                    ),
+                    SizedBox(height: 30.h),
+                    // Skip button at bottom
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 20.h),
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          widget.onComplete?.call();
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              AppLocalizations.skipButton,
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16.sp,
+                              color: Colors.white70,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                : const CircularProgressIndicator(color: Colors.white),
-          ),
-          // Overlay content
-          Positioned.fill(
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // Coin container on top
-                  CoinContainer(coins: widget.coinsAwarded),
-                  const Spacer(),
-                  // Animated coins count
-                  AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      final count = (widget.coinsAwarded * _controller.value)
-                          .round()
-                          .clamp(0, widget.coinsAwarded);
-                      return TextWidget(
-                        text: "+ $count Coins",
-                        fontSize: 25.sp,
-                        color: AppColors.whiteColor,
-                        fontWeight: FontWeight.bold,
-                      );
-                    },
-                  ),
-                  SizedBox(height: 30.h),
-                  // Skip button at bottom
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        widget.onComplete?.call();
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(AppLocalizations.skipButton,
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 14.sp)),
-                          Icon(Icons.arrow_forward_ios,
-                              size: 16.sp, color: Colors.white70),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

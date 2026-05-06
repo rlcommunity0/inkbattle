@@ -49,9 +49,61 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
   /// Current room data (refreshed on init so participantCount and targetPoints are up to date).
   RoomModel? _roomModel;
 
+  int _entryCost() => (_roomModel ?? widget.roomModel)?.entryPoints ?? 250;
+
+  /// Wallet balance for entry check (two-step join).
+  int? _userCoins;
+
+  Future<void> _loadUserCoins() async {
+    final result = await _userRepository.getMe();
+    result.fold(
+      (_) {},
+      (user) {
+        if (mounted) setState(() => _userCoins = user.coins);
+      },
+    );
+  }
+
+  /// Step 1: require sufficient coins, then show "Let's go!". Step 2: call API join.
+  Future<void> _onPrimaryJoinTap() async {
+    if (_isLoading) return;
+    final cost = _entryCost();
+
+    if (!isButtonPressed) {
+      if (_userCoins == null) await _loadUserCoins();
+      if (!mounted) return;
+      final coins = _userCoins;
+      if (coins == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not load your balance. Try again.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+      if (coins < cost) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Not enough coins. This room costs $cost coins (you have $coins).',
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+      setState(() => isButtonPressed = true);
+      return;
+    }
+
+    await _handleJoinRoom(widget.roomId);
+  }
+
   Future<void> _handleJoinRoom(String code) async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
     try {
-      // Join room
       final result = await _roomRepository.joinRoomById(
         roomId: int.parse(code),
       );
@@ -59,10 +111,13 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
       result.fold(
         (failure) {
           if (mounted) {
+            setState(() => isButtonPressed = false);
+            final msg = failure.message.isNotEmpty
+                ? failure.message
+                : AppLocalizations.pleaseCheckCode;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('${AppLocalizations.failedToJoinRoom}'
-                    '${failure.message.isNotEmpty ? failure.message : AppLocalizations.pleaseCheckCode}'),
+                content: Text('${AppLocalizations.failedToJoinRoom}$msg'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -70,21 +125,22 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
         },
         (roomResponse) async {
           if (mounted) {
+            final paid = _entryCost();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content:
-                    Text('${AppLocalizations.successfullyJoinedRoomEntryCost}250 ${AppLocalizations.coins}'),
+                content: Text(
+                  '${AppLocalizations.successfullyJoinedRoomEntryCost}$paid ${AppLocalizations.coins}',
+                ),
                 backgroundColor: Colors.green,
               ),
             );
-
-            // Navigate to game room
             context.push('/game-room/${roomResponse.room?.id}');
           }
         },
       );
     } catch (e) {
       if (mounted) {
+        setState(() => isButtonPressed = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${AppLocalizations.error}: ${e.toString()}'),
@@ -106,6 +162,7 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
     super.initState();
     _roomModel = widget.roomModel;
     _refreshRoom();
+    _loadUserCoins();
   }
 
   Future<void> _refreshRoom() async {
@@ -127,6 +184,7 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
       splitScreenMode: true,
       builder: (_, __) {
         final isTablet = MediaQuery.of(context).size.shortestSide > 600;
+        final entryCost = _entryCost();
 
         return BlueBackgroundScaffold(
           child: SafeArea(
@@ -191,9 +249,12 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
                             : widget.categories.length == 1
                                 ? widget.categories.first
                                 : widget.categories.join(', '),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.lato(
                           color: Colors.white,
-                          fontSize: 32.sp,
+                          fontSize: MediaQuery.of(context).size.width > 600 ? 26.sp : 20.sp,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -208,54 +269,57 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
                         ),
                       ),
                       SizedBox(height: 14.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.person, color: Colors.white, size: 25.sp),
-                          SizedBox(width: 6.w),
-                          Text(
-                            "${(_roomModel ?? widget.roomModel)?.participantCount ?? 0}/${(_roomModel ?? widget.roomModel)?.maxPlayers ?? 0}",
-                            style: GoogleFonts.lato(
-                              color: const Color(0xFFB9C7E5),
-                              fontSize: 24.sp,
-                              fontWeight: FontWeight.w600,
+                      FittedBox(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.person, color: Colors.white, size: 25.sp),
+                            SizedBox(width: 6.w),
+                            Text(
+                              "${(_roomModel ?? widget.roomModel)?.participantCount ?? 0}/${(_roomModel ?? widget.roomModel)?.maxPlayers ?? 0}",
+                              style: GoogleFonts.lato(
+                                color: const Color(0xFFB9C7E5),
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 55.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              Row(children: [
-                                Icon(Icons.language,
-                                    color: Colors.white, size: 28.sp),
-                                SizedBox(width: isTablet ? 6.w : 4.w),
-                                Text(
-                                  (_roomModel ?? widget.roomModel)?.language?.isNotEmpty == true
-                                      ? (_roomModel ?? widget.roomModel)!.language!
-                                      : 'EN',
-                                  style: GoogleFonts.lato(
-                                    color: Colors.white,
-                                    fontSize: isTablet ? 18.sp : 15.sp,
-                                    fontWeight: FontWeight.w500,
+                      SizedBox(height: isTablet ? 40.h : 30.h),
+                      FittedBox(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Row(children: [
+                                  Icon(Icons.language,
+                                      color: Colors.white, size: 28.sp),
+                                  SizedBox(width: isTablet ? 6.w : 4.w),
+                                  Text(
+                                    (_roomModel ?? widget.roomModel)?.language?.isNotEmpty == true
+                                        ? (_roomModel ?? widget.roomModel)!.language!
+                                        : 'EN',
+                                    style: GoogleFonts.lato(
+                                      color: Colors.white,
+                                      fontSize: isTablet ? 18.sp : 15.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                              ]),
-                            ],
-                          ),
-                          Container(
-                            height: 50.h,
-                            width: 1.w,
-                            color: Colors.white.withOpacity(0.5),
-                            margin: EdgeInsets.symmetric(horizontal: 16.w),
-                          ),
-                          Column(
-                            children: [
-                              Row(children: [
+                                ]),
+                              ],
+                            ),
+                            Container(
+                              height: 50.h,
+                              width: 1.w,
+                              color: Colors.white.withOpacity(0.5),
+                              margin: EdgeInsets.symmetric(horizontal: 16.w),
+                            ),
+                            Column(
+                              children: [
+                                Row(children: [
                                 Icon(Icons.people,
                                     color: Colors.white, size: 21.sp),
                                 SizedBox(width: isTablet ? 6.w : 4.w),
@@ -268,80 +332,88 @@ class _OneVsOneScreenState extends State<OneVsOneScreen> {
                                   ),
                                 ),
                               ]),
-                            ],
-                          ),
-                          Container(
-                            height: 50.h,
-                            width: 1.w,
-                            color: Colors.white.withOpacity(0.5),
-                            margin: EdgeInsets.symmetric(horizontal: 16.w),
-                          ),
-                          Column(
-                            children: [
-                              Row(children: [
-                                Icon(Icons.flag,
-                                    color: Colors.amber, size: 21.sp),
-                                SizedBox(width: isTablet ? 6.w : 4.w),
-                                Text(
-                                  "${(_roomModel ?? widget.roomModel)?.pointsTarget ?? 100}",
-                                  style: GoogleFonts.lato(
-                                    color: Colors.white,
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w500,
+                              ],
+                            ),
+                            Container(
+                              height: 50.h,
+                              width: 1.w,
+                              color: Colors.white.withOpacity(0.5),
+                              margin: EdgeInsets.symmetric(horizontal: 16.w),
+                            ),
+                            Column(
+                              children: [
+                                Row(children: [
+                                  Icon(Icons.flag,
+                                      color: Colors.amber, size: 21.sp),
+                                  SizedBox(width: isTablet ? 6.w : 4.w),
+                                  Text(
+                                    "${(_roomModel ?? widget.roomModel)?.pointsTarget ?? 100}",
+                                    style: GoogleFonts.lato(
+                                      color: Colors.white,
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                              ]),
-                            ],
-                          )
-                        ],
+                                ]),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 99.h),
+                      SizedBox(height: isTablet ? 60.h : 40.h),
                       GestureDetector(
-                        onTap: () {
-                          if (!isButtonPressed) _handleJoinRoom(widget.roomId);
-                          if (mounted) {
-                            setState(() {
-                              isButtonPressed = !isButtonPressed;
-                            });
-                          }
-                        },
+                        onTap: _isLoading ? null : () => _onPrimaryJoinTap(),
                         child: Container(
                           width: double.infinity,
                           height: 50.h,
                           padding: EdgeInsets.symmetric(vertical: 10.h),
                           decoration: BoxDecoration(
-                            color: isButtonPressed
-                                ? Colors.green
-                                : const Color.fromARGB(255, 189, 16, 4),
+                            color: _isLoading
+                                ? Colors.grey
+                                : isButtonPressed
+                                    ? Colors.green
+                                    : const Color.fromARGB(255, 189, 16, 4),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              isButtonPressed
-                                  ? Text(
-                                      "🚀  Let's go!",
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
+                              _isLoading
+                                  ? SizedBox(
+                                      width: 22.w,
+                                      height: 22.h,
+                                      child: const CircularProgressIndicator(
+                                        strokeWidth: 2,
                                         color: Colors.white,
                                       ),
                                     )
-                                  : Row(children: [
-                                      Image.asset(
-                                        AppImages.coin,
-                                        height: 30.h,
-                                        width: 30.w,
-                                      ),
-                                      Text(
-                                        "250",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                  : isButtonPressed
+                                      ? Text(
+                                          "🚀  Let's go!",
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Image.asset(
+                                              AppImages.coin,
+                                              height: 30.h,
+                                              width: 30.w,
+                                            ),
+                                            Text(
+                                              '$entryCost',
+                                              style: TextStyle(
+                                                fontSize: 16.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ])
                             ],
                           ),
                         ),

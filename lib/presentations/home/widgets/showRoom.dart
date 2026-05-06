@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:inkbattle_frontend/constants/app_images.dart';
 import 'package:inkbattle_frontend/presentations/home/widgets/button.dart';
 import 'package:inkbattle_frontend/presentations/home/widgets/joinRoom.dart';
+import 'package:inkbattle_frontend/repositories/user_repository.dart';
 import 'package:inkbattle_frontend/utils/lang.dart';
 
 class RoomPopup extends StatelessWidget {
@@ -16,6 +17,29 @@ class RoomPopup extends StatelessWidget {
 
     final double dialogWidth = isTablet ? mq.width * 0.70 : mq.width * 0.85;
     final double closeSize = 30.w;
+    const int minCoinsToEnterRoomFlow = 250;
+
+    Future<bool> canEnterRoomFlow() async {
+      try {
+        final res = await UserRepository().getMe();
+        final coins = res.fold((_) => 0, (u) => u.coins ?? 0);
+        return coins >= minCoinsToEnterRoomFlow;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    void showLowCoinsSnackBar() {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.translate('insufficient_coins_join_with_amount')
+                .replaceFirst('%s', minCoinsToEnterRoomFlow.toString()),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
 
     return Center(
       child: Material(
@@ -37,7 +61,12 @@ class RoomPopup extends StatelessWidget {
                   children: [
                     CustomRoomButton(
                       text: AppLocalizations.createRoom.toUpperCase(),
-                      onPressed: () {
+                      onPressed: () async {
+                        final ok = await canEnterRoomFlow();
+                        if (!ok) {
+                          showLowCoinsSnackBar();
+                          return;
+                        }
                         Navigator.pop(context);
                         context.push('/create-room');
                       },
@@ -45,7 +74,12 @@ class RoomPopup extends StatelessWidget {
                     SizedBox(height: 35.h),
                     CustomRoomButton(
                       text: AppLocalizations.joinRoom.toUpperCase(),
-                      onPressed: () {
+                      onPressed: () async {
+                        final ok = await canEnterRoomFlow();
+                        if (!ok) {
+                          showLowCoinsSnackBar();
+                          return;
+                        }
                         showDialog(
                           context: context,
                           barrierColor: Colors.black,
