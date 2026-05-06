@@ -34,6 +34,8 @@ class AdsFreePopup extends StatefulWidget {
   }) {
     showDialog(
       context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
       builder: (ctx) => AdsFreePopup(
         onAdWatched: onAdWatched,
         parentContext: context,
@@ -56,7 +58,6 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
   bool _adLoadFailed = false;
   bool _shouldClaimReward = false;
   bool _isProcessingPayment = false;
-
   // Platform-specific Product IDs for 8000 coins purchase
   // Android: Google Play Console product ID
   // iOS: App Store Connect product ID
@@ -92,6 +93,20 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
       },
       onError: (String error) {
         _handlePurchaseError(error);
+      },
+      onCancel: () {
+        // User backed out of the Play/App Store sheet.
+        if (mounted) {
+          setState(() {
+            _isProcessingPayment = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Payment cancelled. Please try again.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
       },
     );
   }
@@ -612,10 +627,12 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
     final double coinSize = dialogWidth * 0.30;
     final double closeSize = 30.w;
 
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
+    return PopScope(
+      canPop: !(_isLoading || _isLoadingAd || _isProcessingPayment),
+      child: Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
           key: _contextKey,
           width: dialogWidth,
           decoration: BoxDecoration(
@@ -844,7 +861,9 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
                 top: -closeSize * 0.50,
                 left: -(closeSize * 0.25),
                 child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: (_isLoading || _isLoadingAd || _isProcessingPayment)
+                      ? null
+                      : () => Navigator.pop(context),
                   child: SizedBox(
                     width: closeSize,
                     height: closeSize,
@@ -860,6 +879,7 @@ class _AdsFreePopupState extends State<AdsFreePopup> {
           ),
         ),
       ),
+    ),
     );
   }
 }

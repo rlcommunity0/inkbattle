@@ -209,6 +209,42 @@ class _DrawerMessageOption {
 class _GameRoomScreenState extends State<GameRoomScreen>
     with TickerProviderStateMixin, WidgetsBindingObserver {
   static const String _logTag = 'GameRoomScreen';
+
+  /// Synced with backend `languages` table (display names). Used so lobby UI is populated
+  /// before API returns; `_loadConfig` still refreshes from server when available.
+  static const List<String> _kDefaultLobbyLanguages = [
+    'English',
+    'Hindi',
+    'Telugu',
+    'Marathi',
+    'Kannada',
+    'Malayalam',
+    'Bengali',
+    'Arabic',
+    'Spanish',
+    'Portuguese',
+    'French',
+    'German',
+    'Russian',
+    'Japanese',
+    'Punjabi',
+    'Gujarati',
+  ];
+
+  /// Synced with backend `themes.title`. Must match DB strings used for room categories.
+  static const List<String> _kDefaultLobbyCategories = [
+    'Animals',
+    'Everyday Objects',
+    'Historical Events',
+    'Actions Verbs',
+    'Anime',
+    'Tech Gadgets',
+    'Sports',
+    'Food',
+    'Nature',
+    'Emotions',
+    'Logos',
+  ];
   final RoomRepository _roomRepository = RoomRepository();
   final UserRepository _userRepository = UserRepository();
   final ThemeRepository _themeRepository = ThemeRepository();
@@ -226,6 +262,12 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   UserModel? _currentUser;
 
   bool _isResuming = false;
+  bool _showResumeSyncActions = false;
+  bool _isResumeRetrying = false;
+  Timer? _resumeActionsTimer;
+  int _resumeAttemptId = 0;
+  static const Duration _kResumeActionsDelay = Duration(seconds: 8);
+  static const Duration _kResumeHardTimeout = Duration(seconds: 12);
   bool _isReconnecting = false;
   // bool _listenerRegistered = false;
 
@@ -493,14 +535,14 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   String? selectedGamePlay; // "1 vs 1", "2 vs 2", "3 vs 3"
   int coins = 250; // display-only per UI
 
-  List<String> languages = [];
+  List<String> languages = List<String>.from(_kDefaultLobbyLanguages);
   List<String> scripts = [
     'default',
     'english'
   ]; // Updated to new word_script options
   // Countries are now handled via CountryPickerWidget with ISO-2 codes
   List<int> pointsOptions = [50, 100, 150, 200];
-  List<String> categories = [];
+  List<String> categories = List<String>.from(_kDefaultLobbyCategories);
 
   late RoundAnnouncementManager _announcementManager;
 
@@ -553,8 +595,36 @@ class _GameRoomScreenState extends State<GameRoomScreen>
   }
 
   Future<void> _initialize() async {
-    await _loadConfig();
-    await _initializeRoom();
+    // Run in parallel so socket + room bootstrap are not blocked by languages/categories HTTP.
+    final sw = Stopwatch()..start();
+    NativeLogService.log(
+      '_initialize -> start (parallel _loadConfig + _initializeRoom)',
+      tag: _logTag,
+      level: 'debug',
+    );
+    try {
+      await Future.wait<void>([
+        _loadConfig(),
+        _initializeRoom(),
+      ]);
+      NativeLogService.log(
+        '_initialize -> done in ${sw.elapsedMilliseconds}ms',
+        tag: _logTag,
+        level: 'debug',
+      );
+    } catch (e, st) {
+      NativeLogService.log(
+        '_initialize -> error after ${sw.elapsedMilliseconds}ms: $e',
+        tag: _logTag,
+        level: 'error',
+      );
+      NativeLogService.log(
+        '_initialize -> stack: $st',
+        tag: _logTag,
+        level: 'error',
+      );
+      rethrow;
+    }
   }
 
   Future<void> _preloadVideos() async {
@@ -618,19 +688,17 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     final languagesResult = await _userRepository.getLanguages();
     languagesResult.fold(
       (failure) {
-        // Fallback to default values on error
         if (mounted) {
           setState(() {
-            languages = ['English', 'Hindi', 'Marathi', 'Telugu'];
+            languages = List<String>.from(_kDefaultLobbyLanguages);
           });
         }
       },
       (languagesList) {
         if (languagesList.isEmpty) {
-          // Fallback to default values if empty
           if (mounted) {
             setState(() {
-              languages = ["English", "Hindi", "Marathi", "Telugu"];
+              languages = List<String>.from(_kDefaultLobbyLanguages);
             });
           }
           return;
@@ -650,19 +718,17 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     final categoriesResult = await _themeRepository.getCategories();
     categoriesResult.fold(
       (failure) {
-        // Fallback to default values on error
         if (mounted) {
           setState(() {
-            categories = ['Fruits', 'Animals', 'Food', 'Movies'];
+            categories = List<String>.from(_kDefaultLobbyCategories);
           });
         }
       },
       (categoriesList) {
         if (categoriesList.isEmpty) {
-          // Fallback to default values if empty
           if (mounted) {
             setState(() {
-              categories = ["Fruits", "Animals", "Food", "Movies"];
+              categories = List<String>.from(_kDefaultLobbyCategories);
             });
           }
           return;
@@ -819,6 +885,89 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     });
   }
 
+  void _startResumeAttemptUiState() {
+    _resumeAttemptId++;
+    NativeLogService.log(
+      '_startResumeAttemptUiState -> attemptId=$_resumeAttemptId',
+      tag: _logTag,
+      level: 'debug',
+    );
+    _resumeActionsTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        _isResuming = true;
+        _showResumeSyncActions = false;
+        _isResumeRetrying = false;
+      });
+    }
+
+    final int attemptAtStart = _resumeAttemptId;
+    _resumeActionsTimer = Timer(_kResumeActionsDelay, () {
+      if (!mounted || !_isResuming || attemptAtStart != _resumeAttemptId) return;
+      NativeLogService.log(
+        '_resumeActionsTimer -> showing actions (attemptId=$attemptAtStart)',
+        tag: _logTag,
+        level: 'debug',
+      );
+      setState(() => _showResumeSyncActions = true);
+    });
+
+    // Hard safety: never keep resuming overlay forever.
+    Future.delayed(_kResumeHardTimeout, () {
+      if (!mounted || attemptAtStart != _resumeAttemptId || !_isResuming) return;
+      NativeLogService.log(
+        "Resume timeout - turning off loading indicator",
+        tag: _logTag,
+        level: 'debug',
+      );
+      setState(() {
+        _isResuming = false;
+        _showResumeSyncActions = false;
+        _isResumeRetrying = false;
+      });
+    });
+  }
+
+  void _finishResumeAttemptUiState() {
+    NativeLogService.log(
+      '_finishResumeAttemptUiState -> attemptId=$_resumeAttemptId',
+      tag: _logTag,
+      level: 'debug',
+    );
+    _resumeActionsTimer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _isResuming = false;
+      _showResumeSyncActions = false;
+      _isResumeRetrying = false;
+    });
+  }
+
+  Future<void> _onResumeSyncRetryPressed() async {
+    if (_isResumeRetrying || !_isResuming || !mounted) return;
+    NativeLogService.log(
+      '_onResumeSyncRetryPressed -> start (attemptId=$_resumeAttemptId)',
+      tag: _logTag,
+      level: 'debug',
+    );
+    setState(() => _isResumeRetrying = true);
+    try {
+      await _handleAppResumed();
+      NativeLogService.log(
+        '_onResumeSyncRetryPressed -> done (attemptId=$_resumeAttemptId)',
+        tag: _logTag,
+        level: 'debug',
+      );
+    } catch (e) {
+      NativeLogService.log(
+        '_onResumeSyncRetryPressed -> error (attemptId=$_resumeAttemptId): $e',
+        tag: _logTag,
+        level: 'error',
+      );
+      rethrow;
+    }
+  }
+
   /// Handles getRoomDetails failure (404 retry + exit, non-404 stay in room and trust socket).
   void _handleGetRoomDetailsFailure(dynamic failure) {
     NativeLogService.log(
@@ -832,9 +981,6 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         errorMessage.contains('room not found')) {
       Future.delayed(const Duration(seconds: 1), () async {
         if (!mounted) {
-          if (_isResuming) {
-            setState(() => _isResuming = false);
-          }
           return;
         }
         try {
@@ -852,12 +998,12 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                   retryError.contains('404') ||
                   retryError.contains('room not found')) {
                 if (mounted) {
-                  setState(() => _isResuming = false);
+                  _finishResumeAttemptUiState();
                   _showAdAndExit();
                 }
               } else {
                 if (mounted) {
-                  setState(() => _isResuming = false);
+                  _finishResumeAttemptUiState();
                 }
               }
             },
@@ -866,8 +1012,8 @@ class _GameRoomScreenState extends State<GameRoomScreen>
                 setState(() {
                   _room = retryRoom;
                   _waitingForPlayers = retryRoom.status == 'lobby' || retryRoom.status == 'waiting';
-                  _isResuming = false;
                 });
+                _finishResumeAttemptUiState();
                 if (retryRoom.status == 'playing') {
                   _socketService.socket?.emit('request_canvas_data', {'roomCode': retryRoom.code});
                 }
@@ -881,7 +1027,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             level: 'error'
           );
           if (mounted) {
-            setState(() => _isResuming = false);
+            _finishResumeAttemptUiState();
           }
         }
       });
@@ -892,7 +1038,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         level: 'debug'
       );
       if (mounted) {
-        setState(() => _isResuming = false);
+        _finishResumeAttemptUiState();
       }
       if (_room?.status == 'playing' && _room?.code != null) {
         _socketService.socket?.emit('request_canvas_data', {'roomCode': _room!.code});
@@ -905,7 +1051,6 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     setState(() {
       _room = room;
       _waitingForPlayers = room.status == 'lobby' || room.status == 'waiting';
-      _isResuming = false;
       if (room.status == 'lobby' || room.status == 'waiting') {
         _isGameEnded = false;
         _isPostGameTransition = false;
@@ -942,6 +1087,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
         _lastKnownRoundNumber = room.currentRound;
       }
     });
+    _finishResumeAttemptUiState();
   }
 
   Future<void> _handleAppResumed() async {
@@ -959,27 +1105,37 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       return;
     }
 
-    setState(() => _isResuming = true);
-
-    // SAFEGUARD: ensure loading never runs forever (participant can get stuck otherwise)
-    Future.delayed(const Duration(seconds: 12), () {
-      if (mounted && _isResuming) {
-        NativeLogService.log(
-          "Resume timeout - turning off loading indicator",
-          tag: _logTag,
-          level: 'debug'
-        );
-        setState(() => _isResuming = false);
+    // Avoid double overlays: if socket is not ready, the socket bootstrap overlay already blocks UI.
+    // In that case, skip the resume overlay entirely, but DO "kick" the socket flow so we can recover
+    // when network becomes stable (reconnect + re-join -> room_joined -> connectionState=ready).
+    if (_connectionState != GameConnectionState.ready) {
+      NativeLogService.log(
+        'Resume: socket not ready (connectionState=$_connectionState) -> skipping resume overlay',
+        tag: _logTag,
+        level: 'debug',
+      );
+      // If socket is already connected, re-emit join_room (idempotent on backend; guarded client-side).
+      // If not connected, start the normal connect flow (guarded inside _connectSocket/_isRetrySocketConnecting).
+      if (_socketService.socket?.connected == true) {
+        _joinRoomIfNotRecent();
+      } else {
+        // Fire-and-forget: bootstrap overlay is already shown while syncing.
+        unawaited(_connectSocket());
       }
-    });
+      return;
+    }
+
+    _startResumeAttemptUiState();
+    final int attemptId = _resumeAttemptId;
 
     try {
       await Future.delayed(const Duration(milliseconds: 200));
+      if (!mounted || attemptId != _resumeAttemptId) return;
 
       // Single socket + auto-reconnect: do NOT create new socket on resume. Same socket reconnects; listeners stay attached.
       if (_socketService.socket?.connected == true) {
         await Future.delayed(const Duration(milliseconds: 300));
-        if (!mounted) return;
+        if (!mounted || attemptId != _resumeAttemptId) return;
         _joinRoomIfNotRecent();
       }
       // If disconnected: same socket instance will auto-reconnect; setOnReconnect callback will re-join (room_joined carries phase).
@@ -993,8 +1149,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
             },
           );
 
-      if (!mounted) {
-        _isResuming = false;
+      if (!mounted || attemptId != _resumeAttemptId) {
         return;
       }
 
@@ -1019,12 +1174,27 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       },
     );
     } catch (e) {
+      final isTimeout = e is TimeoutException;
       NativeLogService.log(
         "Exception during resume check: $e - staying in room",
         tag: _logTag,
-        level: 'error'
+        level: isTimeout ? 'debug' : 'error',
       );
-      if (mounted) setState(() => _isResuming = false);
+
+      if (mounted && attemptId == _resumeAttemptId) {
+        if (isTimeout) {
+          // Show actions immediately (no spinner) instead of ending the overlay,
+          // so user can retry or go home on low network.
+          setState(() {
+            _isResuming = true;
+            _showResumeSyncActions = true;
+            _isResumeRetrying = false;
+          });
+        } else {
+          _finishResumeAttemptUiState();
+        }
+      }
+
       if (_room?.status == 'playing' && _room?.code != null) {
         _socketService.socket?.emit('request_canvas_data', {'roomCode': _room!.code});
       }
@@ -4947,6 +5117,7 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     // _listenerRegistered = false;
     NativeLogService.log('dispose', tag: _logTag, level: 'debug');
     _joinWatchdogTimer?.cancel();
+    _resumeActionsTimer?.cancel();
     // _voiceService.cleanUp();
     _closeInterstitialAd?.dispose();
     _strokes.dispose();
@@ -5094,12 +5265,51 @@ class _GameRoomScreenState extends State<GameRoomScreen>
               },
               child: _buildGameScreen(),
             ),
-            if (_isResuming) 
+            if (_isResuming)
               Container(
                 key: const ValueKey('resuming_overlay'), // Keys help Flutter track changes
                 color: Colors.black54,
-                child: const Center(
-                  child: CircularProgressIndicator(color: Colors.cyan),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!_showResumeSyncActions)
+                        const CircularProgressIndicator(color: Colors.cyan),
+                      SizedBox(height: 14.h),
+                      Text(
+                        _showResumeSyncActions
+                            ? 'Still syncing game state...'
+                            : 'Resuming game...',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (_showResumeSyncActions) ...[
+                        SizedBox(height: 14.h),
+                        Wrap(
+                          spacing: 12.w,
+                          children: [
+                            ElevatedButton(
+                              onPressed: _isResumeRetrying
+                                  ? null
+                                  : () => _onResumeSyncRetryPressed(),
+                              child: Text(
+                                _isResumeRetrying ? 'Retrying...' : 'Retry Sync',
+                              ),
+                            ),
+                            OutlinedButton(
+                              onPressed: _isResumeRetrying
+                                  ? null
+                                  : () => _showAdAndExit(),
+                              child: const Text('Go Home'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             if (_isReconnecting)
@@ -11499,16 +11709,15 @@ class _GameRoomScreenState extends State<GameRoomScreen>
     int rank,
     bool isCurrentUser,
   ) {
-    final String? name = (participant?.user?.name?.trim().isNotEmpty == true)
-        ? participant?.user!.name!
+    final String name = (participant?.user?.name?.trim().isNotEmpty == true)
+        ? participant!.user!.name!
         : "Player";
 
     final int score = participant?.score ?? 0;
-
     final String? avatar = participant?.user?.avatar;
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
+      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
       decoration: BoxDecoration(
         color: isCurrentUser
             ? const Color(0xFF0A1628).withOpacity(0.15)
@@ -11523,100 +11732,81 @@ class _GameRoomScreenState extends State<GameRoomScreen>
       ),
       child: Row(
         children: [
-          // Rank Box
+          // Rank
           Container(
-            width: 40.w,
-            height: 40.h,
+            width: 36.w,
+            height: 36.w,
             decoration: BoxDecoration(
               color: const Color(0xFF132238),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Center(
-              child: Text(
-                '$rank',
-                style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.6),
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                ),
+            alignment: Alignment.center,
+            child: Text(
+              '$rank',
+              style: GoogleFonts.lato(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
 
-          SizedBox(width: 16.w),
+          SizedBox(width: 10.w),
 
-          // Avatar with border
+          // Avatar
           if (avatar != null)
             Container(
               padding: EdgeInsets.all(2.r),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: Colors.white, width: 1.5),
               ),
               child: CircleAvatar(
-                radius: 18.r,
+                radius: 16.r,
                 backgroundImage: AssetImage(avatar),
               ),
             ),
 
-          SizedBox(width: 16.w),
+          SizedBox(width: 10.w),
 
-          // Name + Flag
+          // Name + ⭐ (only for current user)
           Expanded(
             child: Row(
               children: [
-                Text(
-                  name ?? "",
-                  style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
+                Flexible(
+                  child: Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.lato(
+                      color: Colors.white,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Image.asset(
-                  AppImages.flag,
-                  width: 24.w,
-                  height: 16.h,
-                ),
+                if (isCurrentUser) ...[
+                  SizedBox(width: 6.w),
+                  Text(
+                    '⭐',
+                    style: TextStyle(fontSize: 16.sp),
+                  ),
+                ],
               ],
             ),
           ),
 
           // Score
-          Row(
-            children: [
-              Image.asset(
-                AppImages.coin,
-                width: 14.w,
-                height: 14.h,
-              ),
-              SizedBox(width: 4.w),
-              Image.asset(
-                AppImages.star,
-                width: 24.w,
-                height: 16.h,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '$score',
-                style: GoogleFonts.lato(
-                  color: isCurrentUser ? const Color(0xFFFFD700) : Colors.white, // Gold color for current user
-                  fontSize: 16.sp,
-                  fontWeight: isCurrentUser ? FontWeight.w700 : FontWeight.w600,
-                ),
-              ),
-              if (isCurrentUser) ...[
-                const SizedBox(width: 6),
-                Text(
-                  '⭐',
-                  style: TextStyle(fontSize: 16.sp),
-                ),
-              ],
-            ],
+          Text(
+            '$score',
+            style: GoogleFonts.lato(
+              color: isCurrentUser ? const Color(0xFFFFD700) : Colors.white,
+              fontSize: 15.sp,
+              fontWeight: isCurrentUser ? FontWeight.w700 : FontWeight.w600,
+            ),
           ),
 
-          const SizedBox(width: 16),
+          SizedBox(width: 8.w),
         ],
       ),
     );
